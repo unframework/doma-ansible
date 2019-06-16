@@ -1,0 +1,4 @@
+---
+- hosts: doma
+  roles:
+    - base
