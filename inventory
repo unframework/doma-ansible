@@ -1,6 +1,6 @@
 [doma]
-patrick.local
-squidward.local
+patrick.local ansible_user=pi
+squidward.local ansible_user=pi
 
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3
