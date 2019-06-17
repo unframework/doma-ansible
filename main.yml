@@ -1,5 +1,5 @@
 ---
-- hosts: squidward.local
+- hosts: doma
   gather_facts: no
   roles:
     - base
