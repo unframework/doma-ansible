@@ -1,4 +1,12 @@
 ---
-- hosts: doma
+- hosts: squidward.local
+  gather_facts: no
   roles:
     - base
+
+  vars:
+    static_ip_gateway: 192.168.1.1
+
+    static_ip_by_host:
+      patrick.local: 192.168.1.80
+      squidward.local: 192.168.1.81

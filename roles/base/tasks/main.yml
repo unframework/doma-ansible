@@ -1,3 +1,22 @@
-- name: Test
-  ping:
+- name: Static IP config for eth0
+  when: ansible_host in static_ip_by_host
+  become: yes
+  copy:
+    dest: /etc/network/interfaces.d/090-doma-static-ip-{{ ansible_host }}
+    content: |
+      # static IP setup for doma-ansible network
+      eth0 auto
+      iface eth0 inet static
+          address {{ static_ip_by_host[ansible_host] }}/24
+          gateway {{ static_ip_gateway }}
+
+- name: Turn off DHCP for eth0
+  when: ansible_host in static_ip_by_host
+  become: yes
+  blockinfile:
+    dest: /etc/dhcpcd.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: doma-ansible-base-static"
+    block: |
+      # avoid overriding static IP setup in /etc/network
+      denyinterfaces eth0
 
