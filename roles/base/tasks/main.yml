@@ -2,15 +2,16 @@
   when: ansible_host in static_ip_by_host
   become: yes
   copy:
-    dest: /etc/network/interfaces.d/090-doma-static-ip-{{ ansible_host }}
+    dest: /etc/network/interfaces.d/doma-static-ip-{{ ansible_host | replace('.', '-') }}
     content: |
       # static IP setup for doma-ansible network
-      eth0 auto
+      auto eth0
       iface eth0 inet static
           address {{ static_ip_by_host[ansible_host] }}/24
           gateway {{ static_ip_gateway }}
+  register: static_ip_config
 
-- name: Turn off DHCP for eth0
+- name: Turn off DHCPCD management for eth0
   when: ansible_host in static_ip_by_host
   become: yes
   blockinfile:
@@ -19,4 +20,17 @@
     block: |
       # avoid overriding static IP setup in /etc/network
       denyinterfaces eth0
+  register: static_dhcp_deny_config
+
+- name: Restart DHCPCD if needed, before restarting network
+  when: static_dhcp_deny_config.changed
+  become: yes
+  service:
+    name: dhcpcd
+    state: restarted
+
+- name: Restart network if needed
+  when: static_ip_config.changed
+  become: yes
+  command: bash -c "ifconfig eth0 down && ifup eth0"
 
