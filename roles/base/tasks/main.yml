@@ -28,3 +28,32 @@
   become: yes
   reboot:
     msg: 'Rebooting to activate static IP {{ static_ip_by_host[ansible_host] }} (vs current IPs {{ ansible_all_ipv4_addresses }})'
+
+# @todo put this in a separate role
+- name: Mount point for USB-attached storage
+  when: ansible_host == 'squidward.local'
+  become: yes
+  file:
+    path: /mnt/usbwdelts
+    state: directory # permissions get reset on mount
+
+- name: Set up USB-attached storage to auto-mount
+  when: ansible_host == 'squidward.local'
+  become: yes
+  mount:
+    path: /mnt/usbwdelts
+    src: UUID=A6BCA8B3BCA88003
+    fstype: ntfs
+    opts: defaults,noatime,auto,noexec,nosuid,uid=pi,gid=pi,fmask=133,dmask=022
+    state: present
+
+- name: Get current mountpoints
+  setup:
+    gather_subset: [ hardware ]
+
+- name: Mount the attached storage
+  when: (ansible_host == 'squidward.local') and (ansible_mounts | selectattr('mount', 'equalto', '/mnt/usbwdelts') | list | length == 0)
+  become: yes
+  command: mount -a
+  args:
+    warn: no # mount module does not perform refresh
