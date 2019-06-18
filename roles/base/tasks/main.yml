@@ -1,5 +1,8 @@
+- name: Get current network information
+  setup:
+    gather_subset: [ network ]
+
 - name: Static IP config for eth0
-  when: ansible_host in static_ip_by_host
   become: yes
   copy:
     dest: /etc/network/interfaces.d/doma-static-ip-{{ ansible_host | replace('.', '-') }}
@@ -9,10 +12,8 @@
       iface eth0 inet static
           address {{ static_ip_by_host[ansible_host] }}/24
           gateway {{ static_ip_gateway }}
-  register: static_ip_config
 
 - name: Turn off DHCPCD management for eth0
-  when: ansible_host in static_ip_by_host
   become: yes
   blockinfile:
     dest: /etc/dhcpcd.conf
@@ -20,17 +21,10 @@
     block: |
       # avoid overriding static IP setup in /etc/network
       denyinterfaces eth0
-  register: static_dhcp_deny_config
 
-- name: Restart DHCPCD if needed, before restarting network
-  when: static_dhcp_deny_config.changed
+# performing full reboot because could not reliably do network-only restart
+- name: Restart box if intended IP is not currently active
+  when: static_ip_by_host[ansible_host] not in ansible_all_ipv4_addresses
   become: yes
-  service:
-    name: dhcpcd
-    state: restarted
-
-- name: Restart network if needed
-  when: static_ip_config.changed
-  become: yes
-  command: bash -c "ifconfig eth0 down && ifup eth0"
-
+  reboot:
+    msg: 'Rebooting to activate static IP {{ static_ip_by_host[ansible_host] }} (vs current IPs {{ ansible_all_ipv4_addresses }})'
