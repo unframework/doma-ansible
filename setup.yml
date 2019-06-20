@@ -1,0 +1,11 @@
+# this playbook is meant to be run per individual host being set up
+
+- hosts: '{{ target | default("no_hosts")}}'
+  gather_facts: no
+
+  vars_files:
+    - vars/static_ip.yml
+
+  roles:
+    - static_ip
+    - pi_setup

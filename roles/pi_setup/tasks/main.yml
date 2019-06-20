@@ -1,8 +1,3 @@
-- name: Ensure new password for this host is provided
-  when: replacement_pi_pass is not defined
-  fail:
-    msg: "Please supply replacement password for the default pi user as replacement_pi_pass"
-
 - name: Set up authorized key from current user
   authorized_key:
     user: '{{ ansible_user }}'
@@ -10,6 +5,7 @@
     key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
 - name: Update Raspberry Pi default user password
+  when: replacement_pi_pass is defined
   become: true
   user:
     name: pi

@@ -1,0 +1,59 @@
+- name: Get target IP address to set up and optional temporary initial IP
+  set_fact:
+    delegate_host: '{{ initial_host | default(ansible_host) }}'
+    target_ip: '{{ static_ip_by_host[inventory_hostname] }}'
+
+- name: Get current network information
+  delegate_to: '{{ delegate_host }}'
+  setup:
+    gather_subset: [ network ]
+
+- name: Static IP config for eth0
+  delegate_to: '{{ delegate_host }}'
+  become: true
+  copy:
+    dest: /etc/network/interfaces.d/doma-static-ip-eth0
+    content: |
+      # static IP setup for doma-ansible network
+      auto eth0
+      iface eth0 inet static
+          address {{ target_ip }}/24
+          gateway {{ static_ip_gateway }}
+
+- name: Turn off DHCPCD management for eth0
+  delegate_to: '{{ delegate_host }}'
+  become: true
+  blockinfile:
+    dest: /etc/dhcpcd.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: doma-ansible-base-static"
+    block: |
+      # avoid overriding static IP setup in /etc/network
+      denyinterfaces eth0
+
+- debug:
+    msg: 'current IPs: {{ ansible_all_ipv4_addresses }}'
+
+# full reboot is used because could not reliably do network-only restart
+- name: Initiate restart if intended IP is not currently active
+  when: target_ip not in ansible_all_ipv4_addresses
+  delegate_to: '{{ delegate_host }}'
+  become: true
+  shell: sleep 2 && shutdown -r now
+  async: 1
+  poll: 0
+  ignore_errors: true
+
+# performing this wait helps in situations that use mDNS, where delegate_host is the intended hostname already
+# (and jumping straight to wait_for_connection could falsely report completion while still shutting down)
+- name: Wait until SSH connection disappears on optional temporary host
+  when: target_ip not in ansible_all_ipv4_addresses
+  delegate_to: localhost
+  wait_for:
+    host: '{{ delegate_host }}'
+    port: 22
+    state: absent
+
+- name: Wait until boot is complete under original intended hostname
+  when: target_ip not in ansible_all_ipv4_addresses
+  wait_for_connection:
+    timeout: 300
