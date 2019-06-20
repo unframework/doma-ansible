@@ -30,9 +30,6 @@
       # avoid overriding static IP setup in /etc/network
       denyinterfaces eth0
 
-- debug:
-    msg: 'current IPs: {{ ansible_all_ipv4_addresses }}'
-
 # full reboot is used because could not reliably do network-only restart
 - name: Initiate restart if intended IP is not currently active
   when: target_ip not in ansible_all_ipv4_addresses
