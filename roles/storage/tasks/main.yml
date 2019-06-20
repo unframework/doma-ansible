@@ -1,0 +1,22 @@
+- name: Mount point for USB-attached storage
+  file:
+    path: '{{ storage_mount_point }}'
+    state: directory # permissions get reset on mount
+
+- name: Set up USB-attached storage to auto-mount
+  mount:
+    path: '{{ storage_mount_point }}'
+    src: UUID={{ storage_uuid }}
+    fstype: ntfs
+    opts: defaults,noatime,auto,noexec,nosuid,uid=pi,gid=pi,fmask=133,dmask=022
+    state: present
+
+- name: Get current mountpoints
+  setup:
+    gather_subset: [ hardware ]
+
+- name: Mount the attached storage
+  when: ansible_mounts | selectattr('mount', 'equalto', '{{ storage_mount_point }}') | list | length == 0
+  command: mount -a
+  args:
+    warn: no # mount module does not perform refresh

@@ -1,6 +1,7 @@
 ---
 - hosts: doma
   gather_facts: no
+  become: yes
   roles:
     - base
 
@@ -10,3 +11,13 @@
     static_ip_by_host:
       patrick.local: 192.168.1.80
       squidward.local: 192.168.1.81
+
+- hosts: squidward.local
+  gather_facts: no
+  become: yes
+  roles:
+    - storage
+
+  vars:
+    storage_mount_point: /mnt/usbmedia
+    storage_uuid: A6BCA8B3BCA88003
