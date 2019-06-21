@@ -10,6 +10,7 @@
   become: yes
   roles:
     - storage
+    - plex
 
   vars:
     storage_mount_point: /mnt/usbmedia

@@ -1,0 +1,27 @@
+- name: Install HTTPS apt transport
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Register Plex apt key
+  apt_key:
+    url: https://downloads.plex.tv/plex-keys/PlexSign.key
+    state: present
+
+- name: Register Plex package sources
+  apt_repository:
+    repo: deb https://downloads.plex.tv/repo/deb public main
+    state: present
+
+- name: Install Plex apt package
+  apt:
+    name: plexmediaserver
+    update_cache: true
+    state: present
+  notify: plex service restart
+
+- name: Autostart Plex and start service
+  service:
+    name: plexmediaserver
+    enabled: true
+  notify: plex service restart
