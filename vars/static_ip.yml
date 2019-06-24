@@ -1,4 +1,5 @@
 static_ip_gateway: 192.168.1.1
+static_ip_nameservers: 192.168.1.1 8.8.4.4 8.8.8.8
 
 static_ip_by_host:
   patrick.local: 192.168.1.120

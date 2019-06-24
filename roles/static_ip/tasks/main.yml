@@ -19,6 +19,7 @@
       iface eth0 inet static
           address {{ target_ip }}/24
           gateway {{ static_ip_gateway }}
+      dns-nameservers {{ static_ip_nameservers }}
 
 - name: Turn off DHCPCD management for eth0
   delegate_to: '{{ delegate_host }}'
