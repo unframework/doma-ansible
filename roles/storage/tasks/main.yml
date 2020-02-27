@@ -3,12 +3,13 @@
     path: '{{ storage_mount_point }}'
     state: directory # permissions get reset on mount
 
+# this relies on plex user having been created
 - name: Set up USB-attached storage to auto-mount
   mount:
     path: '{{ storage_mount_point }}'
     src: UUID={{ storage_uuid }}
     fstype: ntfs
-    opts: defaults,noatime,auto,noexec,nosuid,uid=pi,gid=pi,fmask=133,dmask=022
+    opts: defaults,noatime,auto,noexec,nosuid,uid=plex,gid=plex,fmask=133,dmask=022
     state: present
 
 - name: Get current mountpoints
