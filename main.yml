@@ -9,8 +9,8 @@
   gather_facts: no
   become: yes
   roles:
+    - plex # set up user before storage
     - storage
-    - plex
 
   vars:
     storage_mount_point: /mnt/usbmedia
