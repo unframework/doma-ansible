@@ -17,7 +17,7 @@
   apt:
     name: plexmediaserver
     update_cache: true
-    state: present
+    state: latest
   notify: plex service restart
 
 - name: Autostart Plex and start service
