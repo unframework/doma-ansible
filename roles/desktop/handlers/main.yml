@@ -1,0 +1,2 @@
+- name: RasPi desktop autologin
+  shell: raspi-config nonint do_boot_behaviour B4 # B4 = desktop autologin

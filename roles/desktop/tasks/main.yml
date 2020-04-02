@@ -1,0 +1,17 @@
+- name: Install Chrome apt package
+  apt:
+    name:
+      - xserver-xorg
+      - xserver-xorg-video-fbdev
+      - xinit
+      - pciutils
+      - xinput
+      - xfonts-100dpi
+      - xfonts-75dpi
+      - xfonts-scalable
+      - chromium-browser
+    update_cache: true
+    state: present
+  notify:
+    - RasPi desktop autologin
+    - X server
