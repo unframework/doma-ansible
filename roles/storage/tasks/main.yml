@@ -1,3 +1,8 @@
+- name: Install NTFS support
+  apt:
+    name: ntfs-3g
+    state: present
+
 - name: Mount point for USB-attached storage
   file:
     path: '{{ storage_mount_point }}'

@@ -1,4 +1,5 @@
 [doma]
+plankton.local ansible_user=mmatants
 patrick.local ansible_user=pi
 squidward.local ansible_user=pi
 
