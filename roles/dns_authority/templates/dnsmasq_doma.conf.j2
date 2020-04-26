@@ -1,4 +1,16 @@
 # dnsmasq configuration for Doma
 # {{ ansible_managed }}
 
+# do not read /etc/resolv.conf and /etc/hosts
+no-resolv
+no-hosts
 
+# @todo get NS hostname, interface from var
+# @todo generate SOA stamp?
+auth-server=unframeworkns.ddns.net,eth0
+auth-zone=doma.unframework.net,192.168.1.0/24
+auth-soa=2020042600,doma.unframework.net
+
+host-record=patrick.doma.unframework.net,192.168.1.120
+host-record=squidward.doma.unframework.net,192.168.1.121
+host-record=plankton.doma.unframework.net,192.168.1.130
