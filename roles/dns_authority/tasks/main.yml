@@ -1,0 +1,20 @@
+# sourced from https://github.com/bertvv/ansible-dnsmasq
+- name: Install dnsmasq
+  apt:
+    name: dnsmasq
+    state: present
+
+- name: Set up dnsmasq configuration file
+  template:
+    src: dnsmasq_doma.conf.j2
+    dest: /etc/dnsmasq.d/doma.conf
+    validate: 'dnsmasq --test --conf-file=%s'
+  notify: restart dnsmasq
+  tags: dnsmasq
+
+- name: Make sure dnsmasq is running
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes
+  tags: dnsmasq

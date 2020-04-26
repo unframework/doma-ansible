@@ -11,6 +11,7 @@
   roles:
     - plex # set up user before storage
     - storage
+    - dns_authority
 
   vars:
     storage_mount_point: /mnt/usbmedia
