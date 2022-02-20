@@ -14,7 +14,7 @@
     path: '{{ storage_mount_point }}'
     src: UUID={{ storage_uuid }}
     fstype: ntfs
-    opts: defaults,noatime,auto,nofail,noexec,nosuid,uid=plex,gid=plex,fmask=133,dmask=022
+    opts: defaults,noatime,auto,nofail,noexec,nosuid,uid=plex,gid=plex,fmask=113,dmask=002
     state: present
 
 - name: Get current mountpoints
