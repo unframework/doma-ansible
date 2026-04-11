@@ -7,5 +7,5 @@
 - name: Reload Vector
   systemd:
     name: vector
-    state: reloaded
+    state: restarted
     scope: user
