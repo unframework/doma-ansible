@@ -1,0 +1,52 @@
+---
+- name: Ensure user systemd directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+# Session Sweep
+- name: Template session-sweep service
+  template:
+    src: session-sweep.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/session-sweep.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template session-sweep timer
+  template:
+    src: session-sweep.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/session-sweep.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start session-sweep timer
+  systemd:
+    name: session-sweep.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
+
+# Debug Log Forwarder
+- name: Template debug-log-forwarder service
+  template:
+    src: debug-log-forwarder.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/debug-log-forwarder.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template debug-log-forwarder timer
+  template:
+    src: debug-log-forwarder.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/debug-log-forwarder.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start debug-log-forwarder timer
+  systemd:
+    name: debug-log-forwarder.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes

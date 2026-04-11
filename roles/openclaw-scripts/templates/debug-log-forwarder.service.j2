@@ -1,0 +1,6 @@
+[Unit]
+Description=Forward exec tool results to Telegram debug topic
+
+[Service]
+Type=oneshot
+ExecStart={{ ansible_env.HOME }}/.openclaw/workspace/scripts/debug-log-forwarder.py
