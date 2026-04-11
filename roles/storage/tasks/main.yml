@@ -23,6 +23,4 @@
 
 - name: Mount the attached storage
   when: ansible_mounts | selectattr('mount', 'equalto', storage_mount_point) | list | length == 0
-  command: mount -a
-  args:
-    warn: no # mount module does not perform refresh
+  ansible.builtin.command: mount -a
