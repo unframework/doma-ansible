@@ -1,0 +1,7 @@
+[Unit]
+Description=Push ledger data to origin main
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/ledger-data
+ExecStart=/usr/bin/git push origin main

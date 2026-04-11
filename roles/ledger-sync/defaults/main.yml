@@ -1,0 +1,6 @@
+---
+# Ledger sync role defaults
+
+ledger_data_dir: "{{ ansible_env.HOME }}/ledger-data"
+ledger_fetch_schedule: "hourly"
+ledger_push_schedule: "*-*-* 00/12:00:00"

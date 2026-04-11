@@ -1,0 +1,50 @@
+---
+- name: Ensure user systemd directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template ledger-fetch-all service
+  template:
+    src: ledger-fetch-all.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-fetch-all.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template ledger-fetch-all timer
+  template:
+    src: ledger-fetch-all.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-fetch-all.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template ledger-push service
+  template:
+    src: ledger-push.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-push.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template ledger-push timer
+  template:
+    src: ledger-push.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-push.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start ledger-fetch-all timer
+  systemd:
+    name: ledger-fetch-all.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
+
+- name: Enable and start ledger-push timer
+  systemd:
+    name: ledger-push.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes

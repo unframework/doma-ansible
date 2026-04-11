@@ -1,0 +1,7 @@
+[Unit]
+Description=Fetch all ledger data
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/ledger-data
+ExecStart=%h/ledger-data/scripts/fetch-all.py

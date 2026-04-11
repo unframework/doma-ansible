@@ -1,0 +1,9 @@
+[Unit]
+Description=Push ledger data to origin main periodically
+
+[Timer]
+OnCalendar={{ ledger_push_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

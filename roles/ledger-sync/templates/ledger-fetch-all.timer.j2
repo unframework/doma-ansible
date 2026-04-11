@@ -1,0 +1,9 @@
+[Unit]
+Description=Run ledger-fetch-all {{ ledger_fetch_schedule }}
+
+[Timer]
+OnCalendar={{ ledger_fetch_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

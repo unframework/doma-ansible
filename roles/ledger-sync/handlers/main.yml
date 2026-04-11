@@ -1,0 +1,5 @@
+---
+- name: Reload systemd user
+  systemd:
+    daemon_reload: yes
+    scope: user

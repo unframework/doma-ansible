@@ -6,6 +6,7 @@
     - vars/secrets.yml
   roles:
     - vector
+    - ledger-sync
 
 - hosts: plankton.local
   gather_facts: no
