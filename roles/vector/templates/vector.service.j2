@@ -1,0 +1,13 @@
+[Unit]
+Description=Vector log shipper (user)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/vector --config %h/.config/vector/vector.toml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

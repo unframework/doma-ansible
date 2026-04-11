@@ -1,7 +1,5 @@
 [doma]
-plankton.local ansible_user=mmatants
-patrick.local ansible_user=pi
-squidward.local ansible_user=pi
+plankton.local ansible_user=mmatants ansible_connection=local
 
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3

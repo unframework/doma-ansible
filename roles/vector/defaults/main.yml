@@ -1,0 +1,17 @@
+---
+# Vector role defaults
+
+vector_config_dir: "{{ ansible_env.HOME }}/.config/vector"
+vector_data_dir: "{{ ansible_env.HOME }}/.local/share/vector"
+
+# Better Stack logging endpoint
+vector_betterstack_uri: "https://in.logs.betterstack.com"
+# vector_betterstack_token loaded from vars/secrets.yml (encrypted)
+
+# Host identifier for logs
+vector_host_name: "plankton"
+
+# Systemd user units to ship logs for (substring match)
+vector_log_unit_filters:
+  - "openclaw"
+  - "ledger-"

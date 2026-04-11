@@ -1,0 +1,11 @@
+---
+- name: Reload Vector systemd
+  systemd:
+    daemon_reload: yes
+    scope: user
+
+- name: Reload Vector
+  systemd:
+    name: vector
+    state: reloaded
+    scope: user

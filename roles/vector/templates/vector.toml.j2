@@ -1,0 +1,39 @@
+# Vector config for shipping user journald logs to Better Stack
+# Managed by Ansible - do not edit directly
+
+data_dir = "{{ vector_data_dir }}"
+
+[sources.journald_user]
+type = "journald"
+current_boot_only = true
+# include_units doesn't work for user services (_SYSTEMD_USER_UNIT)
+# Filter in transform instead
+
+[transforms.filter_services]
+type = "filter"
+inputs = ["journald_user"]
+condition = '''
+{% for filter in vector_log_unit_filters %}
+contains(to_string(._SYSTEMD_USER_UNIT) ?? "", "{{ filter }}"){{ " ||" if not loop.last else "" }}
+{% endfor %}
+
+'''
+
+[transforms.enrich]
+type = "remap"
+inputs = ["filter_services"]
+source = '''
+.host = "{{ vector_host_name }}"
+.source = "journald"
+'''
+
+[sinks.betterstack]
+type = "http"
+inputs = ["enrich"]
+uri = "{{ vector_betterstack_uri }}"
+encoding.codec = "json"
+method = "post"
+
+[sinks.betterstack.request.headers]
+Authorization = "Bearer {{ vector_betterstack_token }}"
+Content-Type = "application/json"
