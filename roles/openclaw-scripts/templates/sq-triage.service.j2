@@ -1,0 +1,11 @@
+[Unit]
+Description=Triage one sq task via sub-agent
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/sq-triage-subagent.py
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target

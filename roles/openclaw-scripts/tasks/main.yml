@@ -50,3 +50,26 @@
     state: started
     scope: user
     daemon_reload: yes
+
+# SQ Triage Sub-agent
+- name: Template sq-triage service
+  template:
+    src: sq-triage.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/sq-triage.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template sq-triage timer
+  template:
+    src: sq-triage.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/sq-triage.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start sq-triage timer
+  systemd:
+    name: sq-triage.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
