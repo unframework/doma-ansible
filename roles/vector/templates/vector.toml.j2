@@ -9,6 +9,23 @@ current_boot_only = true
 # include_units doesn't work for user services (_SYSTEMD_USER_UNIT)
 # Filter in transform instead
 
+{% for src in vector_file_sources %}
+[sources.file_{{ src.name }}]
+type = "file"
+include = ["{{ src.path }}"]
+read_from = "end"
+
+[transforms.enrich_file_{{ src.name }}]
+type = "remap"
+inputs = ["file_{{ src.name }}"]
+source = '''
+.host = "{{ vector_host_name }}"
+.source = "file"
+.app = "{{ src.name }}"
+'''
+
+{% endfor %}
+
 [transforms.filter_services]
 type = "filter"
 inputs = ["journald_user"]
@@ -29,7 +46,7 @@ source = '''
 
 [sinks.betterstack]
 type = "http"
-inputs = ["enrich"]
+inputs = ["enrich"{% for src in vector_file_sources %}, "enrich_file_{{ src.name }}"{% endfor %}]
 uri = "{{ vector_betterstack_uri }}"
 encoding.codec = "json"
 method = "post"

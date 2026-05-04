@@ -15,3 +15,8 @@ vector_host_name: "plankton"
 vector_log_unit_filters:
   - "openclaw"
   - "ledger-"
+
+# File sources to ship
+vector_file_sources:
+  - name: "ledger"
+    path: "{{ ansible_env.HOME }}/ledger-data/.git/ledger/sync.log"
