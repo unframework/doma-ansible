@@ -1,0 +1,12 @@
+[Unit]
+Description=Import Notion @todo items into sq
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ ansible_env.HOME }}/.openclaw/workspace
+ExecStart=/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/sq-import-todos.py
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target

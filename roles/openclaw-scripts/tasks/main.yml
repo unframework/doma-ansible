@@ -73,3 +73,26 @@
     state: started
     scope: user
     daemon_reload: yes
+
+# SQ Import (Notion todos)
+- name: Template openclaw-sq-import service
+  template:
+    src: openclaw-sq-import.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-sq-import timer
+  template:
+    src: openclaw-sq-import.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start openclaw-sq-import timer
+  systemd:
+    name: openclaw-sq-import.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
