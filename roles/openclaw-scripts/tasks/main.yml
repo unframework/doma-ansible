@@ -52,23 +52,23 @@
     daemon_reload: yes
 
 # SQ Triage Sub-agent
-- name: Template sq-triage service
+- name: Template openclaw-sq-triage service
   template:
-    src: sq-triage.service.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/sq-triage.service"
+    src: openclaw-sq-triage.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-triage.service"
     mode: '0644'
   notify: Reload systemd user
 
-- name: Template sq-triage timer
+- name: Template openclaw-sq-triage timer
   template:
-    src: sq-triage.timer.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/sq-triage.timer"
+    src: openclaw-sq-triage.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-triage.timer"
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start sq-triage timer
+- name: Enable and start openclaw-sq-triage timer
   systemd:
-    name: sq-triage.timer
+    name: openclaw-sq-triage.timer
     enabled: yes
     state: started
     scope: user
