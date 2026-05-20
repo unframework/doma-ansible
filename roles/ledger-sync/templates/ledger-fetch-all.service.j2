@@ -5,3 +5,4 @@ Description=Fetch all ledger data
 Type=oneshot
 WorkingDirectory=%h/ledger-data
 ExecStart=%h/ledger-data/scripts/fetch-all.py
+ExecStartPost=/bin/bash -c 'export PATH="{{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:$PATH" && qmd update && qmd embed'
