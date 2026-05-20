@@ -1,0 +1,15 @@
+[Unit]
+Description=Obsidian Sync (headless continuous)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.obsidian/Commentary
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin/ob sync --continuous
+Restart=on-failure
+RestartSec=30
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target

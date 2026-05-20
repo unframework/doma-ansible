@@ -15,6 +15,7 @@ vector_host_name: "plankton"
 vector_log_unit_filters:
   - "openclaw"
   - "ledger-"
+  - "obsidian"
 
 # File sources to ship
 vector_file_sources:

@@ -96,3 +96,19 @@
     state: started
     scope: user
     daemon_reload: yes
+
+# Obsidian Sync (headless continuous)
+- name: Template obsidian-sync service
+  template:
+    src: obsidian-sync.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/obsidian-sync.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start obsidian-sync service
+  systemd:
+    name: obsidian-sync.service
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
