@@ -97,6 +97,29 @@
     scope: user
     daemon_reload: yes
 
+# Timeline Tick (per-minute marker reminder)
+- name: Template timeline-tick service
+  template:
+    src: timeline-tick.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/timeline-tick.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template timeline-tick timer
+  template:
+    src: timeline-tick.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/timeline-tick.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start timeline-tick timer
+  systemd:
+    name: timeline-tick.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
+
 # Obsidian Sync (headless continuous)
 - name: Template obsidian-sync service
   template:

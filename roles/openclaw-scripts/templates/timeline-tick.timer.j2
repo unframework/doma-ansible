@@ -1,0 +1,11 @@
+[Unit]
+Description=Run timeline tick every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Persistent=false
+
+[Install]
+WantedBy=timers.target
