@@ -98,26 +98,6 @@
     daemon_reload: yes
 
 # Timeline Tick (per-minute marker reminder)
-- name: Stop and disable legacy timeline-tick units (renamed to openclaw-timeline-tick)
-  systemd:
-    name: "{{ item }}"
-    enabled: no
-    state: stopped
-    scope: user
-  loop:
-    - timeline-tick.timer
-    - timeline-tick.service
-  failed_when: false
-
-- name: Remove legacy timeline-tick unit files
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/{{ item }}"
-    state: absent
-  loop:
-    - timeline-tick.service
-    - timeline-tick.timer
-  notify: Reload systemd user
-
 - name: Template openclaw-timeline-tick service
   template:
     src: openclaw-timeline-tick.service.j2
