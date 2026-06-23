@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/session-sweep.py
+ExecStart=/bin/bash {{ ansible_env.HOME }}/.openclaw/workspace/scripts/journal-dump-sweep.sh
 Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
 
 [Install]

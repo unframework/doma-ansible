@@ -98,23 +98,43 @@
     daemon_reload: yes
 
 # Timeline Tick (per-minute marker reminder)
-- name: Template timeline-tick service
-  template:
-    src: timeline-tick.service.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/timeline-tick.service"
-    mode: '0644'
-  notify: Reload systemd user
-
-- name: Template timeline-tick timer
-  template:
-    src: timeline-tick.timer.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/timeline-tick.timer"
-    mode: '0644'
-  notify: Reload systemd user
-
-- name: Enable and start timeline-tick timer
+- name: Stop and disable legacy timeline-tick units (renamed to openclaw-timeline-tick)
   systemd:
-    name: timeline-tick.timer
+    name: "{{ item }}"
+    enabled: no
+    state: stopped
+    scope: user
+  loop:
+    - timeline-tick.timer
+    - timeline-tick.service
+  failed_when: false
+
+- name: Remove legacy timeline-tick unit files
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/{{ item }}"
+    state: absent
+  loop:
+    - timeline-tick.service
+    - timeline-tick.timer
+  notify: Reload systemd user
+
+- name: Template openclaw-timeline-tick service
+  template:
+    src: openclaw-timeline-tick.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-timeline-tick.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-timeline-tick timer
+  template:
+    src: openclaw-timeline-tick.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-timeline-tick.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start openclaw-timeline-tick timer
+  systemd:
+    name: openclaw-timeline-tick.timer
     enabled: yes
     state: started
     scope: user
