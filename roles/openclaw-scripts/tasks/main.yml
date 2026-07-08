@@ -66,11 +66,12 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start openclaw-sq-triage timer
+# Disabled 2026-07-08: paused per Nick. Flip back to enabled=yes/state=started to resume.
+- name: Disable and stop openclaw-sq-triage timer
   systemd:
     name: openclaw-sq-triage.timer
-    enabled: yes
-    state: started
+    enabled: no
+    state: stopped
     scope: user
     daemon_reload: yes
 
