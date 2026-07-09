@@ -1,0 +1,11 @@
+[Unit]
+Description=Reset the main agent Telegram DM session (agent:main:main) before the 6am timeline morning triage
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin/openclaw gateway call sessions.reset --params '{"key":"agent:main:main"}'
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=default.target

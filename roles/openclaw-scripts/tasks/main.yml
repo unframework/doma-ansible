@@ -75,6 +75,29 @@
     scope: user
     daemon_reload: yes
 
+# Main Session Reset (agent:main:main daily reset before morning triage)
+- name: Template openclaw-main-session-reset service
+  template:
+    src: openclaw-main-session-reset.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-main-session-reset.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-main-session-reset timer
+  template:
+    src: openclaw-main-session-reset.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-main-session-reset.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start openclaw-main-session-reset timer
+  systemd:
+    name: openclaw-main-session-reset.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
+
 # SQ Import (Notion todos)
 - name: Template openclaw-sq-import service
   template:
