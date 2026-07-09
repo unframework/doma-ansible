@@ -1,9 +1,0 @@
-[Unit]
-Description=Reset the main agent Telegram DM session daily at 5:58am ET (just before 6am timeline morning triage)
-
-[Timer]
-OnCalendar=*-*-* 05:58:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target
