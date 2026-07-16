@@ -17,5 +17,10 @@ dev_install_gh: true
 # (`ngrok config add-authtoken <token>`) — the role only installs the binary.
 dev_install_ngrok: true
 
+# gmsaas (Genymotion Cloud SaaS CLI) — pip-installed to ~/.local/. Auth token
+# lives in ~/.Genymobile/gmsaas/auth.json (managed manually, not by Ansible).
+dev_install_gmsaas: true
+dev_gmsaas_version: "1.15.0"
+
 # yoclaude alias — dangerous-permissions wrapper for claude
 dev_yoclaude_alias: "alias yoclaude='claude --dangerously-skip-permissions'"
