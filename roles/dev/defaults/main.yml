@@ -13,5 +13,9 @@ dev_install_claude: true
 # GitHub CLI — via the official apt repo. Idempotent (apt handles version check).
 dev_install_gh: true
 
+# ngrok — via the official apt repo. Auth token must be added manually per host
+# (`ngrok config add-authtoken <token>`) — the role only installs the binary.
+dev_install_ngrok: true
+
 # yoclaude alias — dangerous-permissions wrapper for claude
 dev_yoclaude_alias: "alias yoclaude='claude --dangerously-skip-permissions'"

@@ -124,3 +124,56 @@
     state: present
   become: true
   when: dev_install_gh | bool
+
+# ---------------------------------------------------------------------------
+# ngrok (apt)
+# ---------------------------------------------------------------------------
+# Matches plankton's existing setup: signing key at /etc/apt/trusted.gpg.d/
+# (legacy location, still supported) and hardcoded 'bookworm' component
+# (ngrok's official apt install docs use this universally regardless of
+# actual Debian release).
+
+- name: Check for existing ngrok apt signing key
+  ansible.builtin.stat:
+    path: /etc/apt/trusted.gpg.d/ngrok.asc
+  register: dev_ngrok_keyring_stat
+
+- name: Install ngrok apt signing key (only if missing)
+  ansible.builtin.command:
+    cmd: curl -fsSL -o /etc/apt/trusted.gpg.d/ngrok.asc https://ngrok-agent.s3.amazonaws.com/ngrok.asc
+    creates: /etc/apt/trusted.gpg.d/ngrok.asc
+  become: true
+  when:
+    - dev_install_ngrok | bool
+    - not dev_ngrok_keyring_stat.stat.exists
+
+- name: Fix permissions on ngrok apt signing key
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/ngrok.asc
+    mode: '0644'
+  become: true
+  when: dev_install_ngrok | bool
+
+- name: Add ngrok apt repo
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/ngrok.list
+    content: "deb https://ngrok-agent.s3.amazonaws.com bookworm main\n"
+    mode: '0644'
+  become: true
+  when: dev_install_ngrok | bool
+  register: dev_ngrok_repo
+
+- name: Update apt cache after adding ngrok repo
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  when:
+    - dev_install_ngrok | bool
+    - dev_ngrok_repo.changed
+
+- name: Install ngrok package
+  ansible.builtin.apt:
+    name: ngrok
+    state: present
+  become: true
+  when: dev_install_ngrok | bool
