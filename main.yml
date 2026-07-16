@@ -15,10 +15,10 @@
   vars_files:
     - vars/secrets.yml
   roles:
-    - dev
-    - openclaw-base
-    - openclaw-scripts
-    - ledger-sync
+    - { role: dev, tags: ['dev'] }
+    - { role: openclaw-base, tags: ['openclaw-base'] }
+    - { role: openclaw-scripts, tags: ['openclaw-scripts'] }
+    - { role: ledger-sync, tags: ['ledger-sync'] }
 
 - hosts: plankton.local
   gather_facts: no

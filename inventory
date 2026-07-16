@@ -3,9 +3,11 @@ plankton.local ansible_user=mmatants ansible_connection=local
 sandy.local    ansible_user=mmatants ansible_connection=ssh
 
 # Which host currently runs the OpenClaw gateway (+ companions).
-# During migration this stays as plankton.local; flip to sandy.local at cutover.
+# During migration both hosts are members; sandy is exercised via role tags.
+# At cutover, remove plankton.local and keep only sandy.local here.
 [openclaw_host]
 plankton.local
+sandy.local
 
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3

@@ -35,12 +35,14 @@
 # ---------------------------------------------------------------------------
 # yoclaude alias in ~/.bashrc
 # ---------------------------------------------------------------------------
-# Managed as a plain lineinfile so we don't disturb the existing hand-edited
-# ~/.bashrc structure. This matches the exact line currently present.
+# Uses a regex so the task is idempotent regardless of quote style
+# (existing lines might use single or double quotes). Only adds a line if
+# no matching alias definition already exists.
 
 - name: Ensure yoclaude alias line in ~/.bashrc
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^\\s*alias\\s+yoclaude\\s*="
     line: "{{ dev_yoclaude_alias }}"
     state: present
     insertafter: EOF
@@ -82,14 +84,22 @@
   register: dev_gh_keyring_stat
 
 - name: Install GitHub CLI apt signing key (only if missing)
-  ansible.builtin.get_url:
-    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-    mode: '0644'
+  # Uses curl instead of get_url because get_url in older ansible-core versions
+  # errors on Python 3.12+ ("HTTPSConnection got unexpected 'cert_file'").
+  ansible.builtin.command:
+    cmd: curl -fsSL -o /etc/apt/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    creates: /etc/apt/keyrings/githubcli-archive-keyring.gpg
   become: true
   when:
     - dev_install_gh | bool
     - not dev_gh_keyring_stat.stat.exists
+
+- name: Fix permissions on GitHub CLI apt signing key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: '0644'
+  become: true
+  when: dev_install_gh | bool
 
 - name: Add GitHub CLI apt repo
   ansible.builtin.copy:
