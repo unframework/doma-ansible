@@ -1,0 +1,32 @@
+---
+# openclaw-base — install the openclaw CLI (npm global) + template the gateway
+# systemd user service. Idempotent: no-op when target already matches.
+
+- name: Ensure openclaw npm package is installed at pinned version
+  community.general.npm:
+    name: openclaw
+    version: "{{ openclaw_version }}"
+    global: true
+    executable: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ openclaw_node_version }}/bin/npm"
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ openclaw_node_version }}/bin:{{ ansible_env.PATH }}"
+
+- name: Ensure user systemd directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template openclaw-gateway.service unit
+  ansible.builtin.template:
+    src: openclaw-gateway.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gateway.service"
+    mode: '0644'   # matches existing; ~/.config is 0700 so token is not exposed
+  notify: Reload systemd user
+
+- name: Enable openclaw-gateway user service (do not force-start; existing state preserved)
+  ansible.builtin.systemd:
+    name: openclaw-gateway.service
+    enabled: true
+    scope: user
+    daemon_reload: true

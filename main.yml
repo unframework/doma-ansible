@@ -8,15 +8,17 @@
   roles:
     - vector
 
-# plankton-only: ledger sync + openclaw scripts
-- hosts: plankton.local
+# OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync
+- hosts: openclaw_host
   gather_facts: yes
   become: no
   vars_files:
     - vars/secrets.yml
   roles:
-    - ledger-sync
+    - dev
+    - openclaw-base
     - openclaw-scripts
+    - ledger-sync
 
 - hosts: plankton.local
   gather_facts: no

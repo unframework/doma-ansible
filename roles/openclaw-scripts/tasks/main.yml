@@ -144,6 +144,16 @@
     daemon_reload: yes
 
 # Obsidian Sync (headless continuous)
+
+- name: Ensure obsidian-headless (ob) CLI is installed globally
+  community.general.npm:
+    name: obsidian-headless
+    state: present
+    global: true
+    executable: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ obsidian_node_version | default('v22.21.1') }}/bin/npm"
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ obsidian_node_version | default('v22.21.1') }}/bin:{{ ansible_env.PATH }}"
+
 - name: Template obsidian-sync service
   template:
     src: obsidian-sync.service.j2

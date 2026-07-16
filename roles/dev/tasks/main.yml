@@ -1,0 +1,116 @@
+---
+# General-purpose dev tooling. Idempotent: only installs when missing.
+# Existing manual installs on plankton are left untouched.
+
+# ---------------------------------------------------------------------------
+# nvm + node
+# ---------------------------------------------------------------------------
+
+- name: Check for existing nvm install
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  register: dev_nvm_stat
+
+- name: Install nvm (only if not already present)
+  ansible.builtin.shell: >
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/{{ dev_nvm_version }}/install.sh | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  when: not dev_nvm_stat.stat.exists
+
+- name: Check whether target node version is already installed under nvm
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ dev_node_version }}/bin/node"
+  register: dev_node_stat
+
+- name: Install pinned node version via nvm (only if missing)
+  ansible.builtin.shell: |
+    export NVM_DIR="$HOME/.nvm"
+    . "$NVM_DIR/nvm.sh"
+    nvm install {{ dev_node_version }}
+  args:
+    executable: /bin/bash
+  when: not dev_node_stat.stat.exists
+
+# ---------------------------------------------------------------------------
+# yoclaude alias in ~/.bashrc
+# ---------------------------------------------------------------------------
+# Managed as a plain lineinfile so we don't disturb the existing hand-edited
+# ~/.bashrc structure. This matches the exact line currently present.
+
+- name: Ensure yoclaude alias line in ~/.bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "{{ dev_yoclaude_alias }}"
+    state: present
+    insertafter: EOF
+
+# ---------------------------------------------------------------------------
+# Claude Code CLI
+# ---------------------------------------------------------------------------
+
+- name: Check for existing claude binary
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/claude"
+  register: dev_claude_stat
+
+- name: Install Claude Code CLI (only if missing)
+  ansible.builtin.shell: |
+    curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    executable: /bin/bash
+    creates: "{{ ansible_env.HOME }}/.local/bin/claude"
+  when:
+    - dev_install_claude | bool
+    - not dev_claude_stat.stat.exists
+
+# ---------------------------------------------------------------------------
+# GitHub CLI (apt)
+# ---------------------------------------------------------------------------
+
+- name: Ensure /etc/apt/keyrings exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+  when: dev_install_gh | bool
+
+- name: Check for existing GitHub CLI apt signing key
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  register: dev_gh_keyring_stat
+
+- name: Install GitHub CLI apt signing key (only if missing)
+  ansible.builtin.get_url:
+    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    mode: '0644'
+  become: true
+  when:
+    - dev_install_gh | bool
+    - not dev_gh_keyring_stat.stat.exists
+
+- name: Add GitHub CLI apt repo
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/github-cli.list
+    content: "deb [arch=amd64 signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\n"
+    mode: '0644'
+  become: true
+  when: dev_install_gh | bool
+  register: dev_gh_repo
+
+- name: Update apt cache after adding gh repo
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  when:
+    - dev_install_gh | bool
+    - dev_gh_repo.changed
+
+- name: Install gh package
+  ansible.builtin.apt:
+    name: gh
+    state: present
+  become: true
+  when: dev_install_gh | bool

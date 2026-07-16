@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenClaw Gateway (v{{ openclaw_service_version }})
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/{{ openclaw_node_version }}/bin/node {{ ansible_env.HOME }}/.nvm/versions/node/{{ openclaw_node_version }}/lib/node_modules/openclaw/dist/index.js gateway --port {{ openclaw_gateway_port }}
+Restart=on-failure
+RestartSec=5
+KillMode=process
+Environment=NODE_LLAMA_CPP_GPU={{ openclaw_service_node_llama_gpu | string | lower }}
+Environment=HOME={{ ansible_env.HOME }}
+Environment=TMPDIR=/tmp
+Environment=PATH={{ openclaw_service_path }}
+Environment=OPENCLAW_GATEWAY_PORT={{ openclaw_gateway_port }}
+Environment=OPENCLAW_GATEWAY_TOKEN={{ openclaw_gateway_token }}
+Environment=OPENCLAW_SYSTEMD_UNIT=openclaw-gateway.service
+Environment=OPENCLAW_SERVICE_MARKER=openclaw
+Environment=OPENCLAW_SERVICE_KIND=gateway
+Environment=OPENCLAW_SERVICE_VERSION={{ openclaw_service_version }}
+
+[Install]
+WantedBy=default.target

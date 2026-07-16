@@ -1,0 +1,24 @@
+---
+# openclaw-base defaults — installs the openclaw npm CLI + gateway systemd unit.
+# Values match plankton's current state so re-runs on plankton are no-ops.
+
+# Pinned openclaw npm version. Bump this variable + rerun to update.
+# Note: this is the version installed via npm. openclaw_service_version below
+# is a separate label baked into the systemd unit's Environment= lines and
+# only bumped when the unit file itself is intentionally re-templated.
+openclaw_version: "2026.5.28"
+
+# Node version whose npm/bin dirs the gateway service runs against.
+# Should be present under nvm (installed by the `dev` role).
+openclaw_node_version: "v22.21.1"
+
+# Systemd unit knobs. Defaults freeze plankton's current unit content.
+openclaw_service_version: "2026.3.2"    # baked into Description + OPENCLAW_SERVICE_VERSION
+openclaw_gateway_port: 18789
+openclaw_service_node_llama_gpu: false  # plankton has no GPU; sandy would set true
+
+# Env PATH — matches plankton's existing service. Kept as a single string
+# so future edits are explicit and reviewable.
+openclaw_service_path: "/home/mmatants/.nvm/current/bin:/home/mmatants/.local/bin:/home/mmatants/.npm-global/bin:/home/mmatants/bin:/home/mmatants/.volta/bin:/home/mmatants/.asdf/shims:/home/mmatants/.bun/bin:/home/mmatants/.fnm/current/bin:/home/mmatants/.local/share/pnpm:/usr/local/bin:/usr/bin:/bin"
+
+# openclaw_gateway_token: loaded from vaulted vars/secrets.yml
