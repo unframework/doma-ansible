@@ -1,4 +1,13 @@
 ---
+- name: Install Vector from vector.dev apt repo
+  ansible.builtin.include_tasks: install.yml
+
+- name: Enable systemd lingering (so user services run at boot without login)
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ ansible_user_id }}"
+    creates: "/var/lib/systemd/linger/{{ ansible_user_id }}"
+  become: yes
+
 - name: Ensure Vector config directory exists
   file:
     path: "{{ vector_config_dir }}"

@@ -1,0 +1,15 @@
+---
+# plankton-specific vector settings
+vector_host_name: plankton
+
+vector_log_unit_filters:
+  - "openclaw"
+  - "ledger-"
+  - "obsidian"
+
+vector_file_sources:
+  - name: "ledger"
+    path: "{{ ansible_env.HOME }}/ledger-data/.git/ledger/sync.log"
+
+# plankton doesn't currently ship system journal
+vector_include_system_journal: false

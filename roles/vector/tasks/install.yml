@@ -1,0 +1,54 @@
+---
+# Vector install via vector.dev apt repository
+# All tasks here need root; using per-task become.
+
+- name: Ensure keyring directory exists
+  file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Check if vector.dev signing key already present
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/datadog-archive-keyring.gpg
+  register: vector_key_stat
+
+- name: Fetch and combine Datadog APT signing keys for vector.dev
+  ansible.builtin.shell:
+    cmd: |
+      set -euo pipefail
+      tmpdir=$(mktemp -d)
+      trap 'rm -rf "$tmpdir"' EXIT
+      for key in DATADOG_APT_KEY_CURRENT.public DATADOG_APT_KEY_C0962C7D.public DATADOG_APT_KEY_F14F620E.public; do
+        curl -fsSL "https://keys.datadoghq.com/${key}" >> "$tmpdir/combined.asc"
+        echo >> "$tmpdir/combined.asc"
+      done
+      gpg --dearmor --yes -o /usr/share/keyrings/datadog-archive-keyring.gpg "$tmpdir/combined.asc"
+  args:
+    creates: /usr/share/keyrings/datadog-archive-keyring.gpg
+  become: yes
+  when: not vector_key_stat.stat.exists
+
+- name: Add vector.dev apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.vector.dev/ stable vector-0"
+    filename: vector
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install vector package
+  ansible.builtin.apt:
+    name: vector
+    state: present
+  become: yes
+
+- name: Mask system-wide vector service (we use user-level)
+  ansible.builtin.systemd:
+    name: vector
+    enabled: no
+    state: stopped
+    masked: yes
+  become: yes
+  failed_when: false

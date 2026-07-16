@@ -1,11 +1,20 @@
 ---
-- hosts: plankton.local
+# Vector log shipping runs on all doma hosts
+- hosts: doma
   gather_facts: yes
   become: no
   vars_files:
     - vars/secrets.yml
   roles:
     - vector
+
+# plankton-only: ledger sync + openclaw scripts
+- hosts: plankton.local
+  gather_facts: yes
+  become: no
+  vars_files:
+    - vars/secrets.yml
+  roles:
     - ledger-sync
     - openclaw-scripts
 

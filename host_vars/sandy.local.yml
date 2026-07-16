@@ -1,0 +1,23 @@
+---
+# sandy-specific vector settings
+vector_host_name: sandy
+
+# No user-service filter yet — sandy currently has no openclaw/ledger/obsidian
+# When those get added, list substrings here to filter user units
+vector_log_unit_filters: []
+
+# No custom file sources yet
+vector_file_sources: []
+
+# Ship system journal on sandy — it's Tailscale-reachable, useful for auditing
+vector_include_system_journal: true
+
+# Focus on interesting system units; empty list would ship everything
+vector_system_journal_units:
+  - "ssh.service"
+  - "sshd.service"
+  - "tailscaled.service"
+  - "systemd-logind.service"
+  - "ufw.service"
+  - "unattended-upgrades.service"
+  - "fail2ban.service"
