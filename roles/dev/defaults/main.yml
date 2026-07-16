@@ -22,5 +22,10 @@ dev_install_ngrok: true
 dev_install_gmsaas: true
 dev_gmsaas_version: "1.15.0"
 
+# adb (Android Debug Bridge) — used by gmsaas for cloud device access.
+# The ~/android-sdk stub dir + gmsaas config.json android-sdk-path are
+# handled manually per host (they're quirky one-offs).
+dev_install_adb: true
+
 # yoclaude alias — dangerous-permissions wrapper for claude
 dev_yoclaude_alias: "alias yoclaude='claude --dangerously-skip-permissions'"

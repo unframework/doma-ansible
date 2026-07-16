@@ -206,3 +206,14 @@
   when:
     - dev_install_gmsaas | bool
     - not dev_gmsaas_stat.stat.exists
+
+# ---------------------------------------------------------------------------
+# adb (Android Debug Bridge) — used by gmsaas for cloud device access
+# ---------------------------------------------------------------------------
+
+- name: Install adb package
+  ansible.builtin.apt:
+    name: adb
+    state: present
+  become: true
+  when: dev_install_adb | bool
