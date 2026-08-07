@@ -43,11 +43,12 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start debug-log-forwarder timer
+# Disabled 2026-08-07: paused per Nick — too noisy in Telegram debug topic. Flip back to enabled=yes/state=started to resume.
+- name: Disable and stop debug-log-forwarder timer
   systemd:
     name: debug-log-forwarder.timer
-    enabled: yes
-    state: started
+    enabled: no
+    state: stopped
     scope: user
     daemon_reload: yes
 
