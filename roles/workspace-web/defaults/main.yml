@@ -34,3 +34,20 @@ webapp_openclaw_config: "{{ ansible_env.HOME }}/.openclaw/openclaw.json"
 # Env PATH for the service. The server shells out to nothing, but keep node on
 # PATH so any future child process resolves the same runtime.
 webapp_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ webapp_node_version }}/bin:{{ ansible_env.HOME }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+# Tailscale Funnel — PUBLIC internet exposure, unlike herd's tailnet-only Serve.
+#
+# Funnel (not Serve) because Telegram's webview fetches the Mini App from
+# Telegram's own infrastructure, which is not on the tailnet; a Serve mapping
+# would be unreachable and the button would just fail to load.
+#
+# What makes that acceptable here: every /api route requires an initData
+# signature made with the bot token and a user id in webapp_allowed_user_ids.
+# Public traffic gets the static shell and a 401. Two consequences worth
+# remembering: the UI bundle itself is world-readable, and a leaked bot token
+# is an auth bypass, so rotating it means redeploying, not just editing config.
+webapp_funnel: true
+
+# Funnel only accepts 443, 8443 and 10000. On plankton 443 is the OpenClaw
+# gateway and 8443 is herd, so 10000 is the one free slot.
+webapp_funnel_port: 10000
