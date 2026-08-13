@@ -1,0 +1,24 @@
+[Unit]
+Description=Workspace web (Telegram Mini App timeline)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ webapp_install_dir }}/server
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/{{ webapp_node_version }}/bin/node {{ webapp_install_dir }}/server/server.cjs
+Restart=on-failure
+RestartSec=2
+Environment=HOME={{ ansible_env.HOME }}
+Environment=TMPDIR=/tmp
+Environment=PATH={{ webapp_service_path }}
+Environment=WEBAPP_PORT={{ webapp_port }}
+Environment=WEBAPP_HOST={{ webapp_bind_host }}
+Environment=WEBAPP_UI_DIST={{ webapp_install_dir }}/ui
+Environment=WEBAPP_ALLOWED_USER_IDS={{ webapp_allowed_user_ids | join(',') }}
+Environment=WEBAPP_TIMELINE_DIR={{ webapp_timeline_dir }}
+Environment=WEBAPP_TIMEZONE={{ webapp_timezone }}
+Environment=WEBAPP_OPENCLAW_CONFIG={{ webapp_openclaw_config }}
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,36 @@
+---
+# workspace-web defaults — systemd user unit for the Telegram Mini App that
+# serves today's timeline.
+#
+# The bundle itself (~/.local/lib/workspace-web/{server,ui}) is NOT managed
+# here — it is pushed out-of-band with `yarn deploy` from
+# ~/.openclaw/workspace/web. This role only owns the unit and its env.
+
+# Where `yarn deploy` lands the bundle (matches WEBAPP_DEPLOY_DIR's default).
+webapp_install_dir: "{{ ansible_env.HOME }}/.local/lib/workspace-web"
+
+# Node version the server runs against. Must be installed under nvm — the
+# `dev` role's dev_extra_node_versions keeps it there.
+webapp_node_version: "v24.18.0"
+
+# Server bind. Loopback only: every /api route is gated on Telegram initData,
+# but the listener has no business being reachable off-host.
+webapp_port: 8909
+webapp_bind_host: "127.0.0.1"
+
+# Telegram user IDs allowed through initData auth. Unset/empty = deny all,
+# so this list is what makes the app usable at all.
+webapp_allowed_user_ids:
+  - "1003656883486"
+
+# Which day counts as "today" when globbing the timeline dir. Must mirror the
+# tz that scripts/timeline.py writes with, or the app reads the wrong file.
+webapp_timezone: "America/Toronto"
+
+# Data + config the server reads at runtime.
+webapp_timeline_dir: "{{ ansible_env.HOME }}/.openclaw/timeline"
+webapp_openclaw_config: "{{ ansible_env.HOME }}/.openclaw/openclaw.json"
+
+# Env PATH for the service. The server shells out to nothing, but keep node on
+# PATH so any future child process resolves the same runtime.
+webapp_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ webapp_node_version }}/bin:{{ ansible_env.HOME }}/.local/bin:/usr/local/bin:/usr/bin:/bin"

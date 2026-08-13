@@ -20,6 +20,14 @@
     - { role: openclaw-scripts, tags: ['openclaw-scripts'] }
     - { role: ledger-sync, tags: ['ledger-sync'] }
 
+# Workspace web — Telegram Mini App timeline server (plankton only; it needs
+# the openclaw timeline data + bot token that live on the gateway host)
+- hosts: webapp_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: workspace-web, tags: ['workspace-web'] }
+
 - hosts: plankton.local
   gather_facts: no
   become: yes

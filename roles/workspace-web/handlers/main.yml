@@ -1,0 +1,11 @@
+---
+- name: Reload systemd user
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    scope: user
+
+- name: Restart workspace-web
+  ansible.builtin.systemd:
+    name: workspace-web.service
+    state: restarted
+    scope: user

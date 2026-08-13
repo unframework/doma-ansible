@@ -6,6 +6,7 @@ vector_log_unit_filters:
   - "openclaw"
   - "ledger-"
   - "obsidian"
+  - "workspace-web"
 
 vector_file_sources:
   - name: "ledger"

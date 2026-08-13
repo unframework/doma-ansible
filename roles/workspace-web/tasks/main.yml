@@ -1,0 +1,57 @@
+---
+# workspace-web — systemd user unit for the Telegram Mini App timeline server.
+# The bundle under webapp_install_dir is deployed out-of-band (`yarn deploy`
+# from ~/.openclaw/workspace/web).
+
+- name: Check that the workspace-web bundle is present
+  ansible.builtin.stat:
+    path: "{{ webapp_install_dir }}/server/server.cjs"
+  register: webapp_bundle_stat
+
+- name: Fail early if the workspace-web bundle has not been deployed
+  ansible.builtin.fail:
+    msg: >-
+      {{ webapp_install_dir }}/server/server.cjs is missing.
+      Run `yarn deploy` in ~/.openclaw/workspace/web on this host first —
+      Ansible does not ship the bundle.
+  when: not webapp_bundle_stat.stat.exists
+
+- name: Check that the pinned node version is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ webapp_node_version }}/bin/node"
+  register: webapp_node_stat
+
+- name: Fail early if the pinned node version is missing
+  ansible.builtin.fail:
+    msg: "node {{ webapp_node_version }} not installed under nvm — run the `dev` role first."
+  when: not webapp_node_stat.stat.exists
+
+# Unset/empty means the server denies every request, which looks like a broken
+# deploy rather than a config mistake. Catch it here instead.
+- name: Fail early if no Telegram user IDs are allowlisted
+  ansible.builtin.fail:
+    msg: "webapp_allowed_user_ids is empty — the app would 401 every request."
+  when: (webapp_allowed_user_ids | default([]) | length) == 0
+
+- name: Ensure user systemd directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template workspace-web.service unit
+  ansible.builtin.template:
+    src: workspace-web.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/workspace-web.service"
+    mode: '0644'
+  notify:
+    - Reload systemd user
+    - Restart workspace-web
+
+- name: Enable and start workspace-web user service
+  ansible.builtin.systemd:
+    name: workspace-web.service
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true

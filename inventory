@@ -9,5 +9,10 @@ sandy.local    ansible_user=mmatants ansible_connection=ssh
 plankton.local
 sandy.local
 
+# Host running the workspace web Mini App. Must be the host holding
+# ~/.openclaw/timeline and the bot token in ~/.openclaw/openclaw.json.
+[webapp_host]
+plankton.local
+
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3
