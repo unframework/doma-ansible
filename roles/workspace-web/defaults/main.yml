@@ -20,8 +20,13 @@ webapp_bind_host: "127.0.0.1"
 
 # Telegram user IDs allowed through initData auth. Unset/empty = deny all,
 # so this list is what makes the app usable at all.
+#
+# These are USER ids, not chat ids. The app previously carried 1003656883486,
+# which is the group chat -1003656883486 with its `-100` supergroup prefix
+# stripped — it matched nobody, so every real open 401'd. The user id is the
+# one in channels.telegram.groups[...].allowFrom in openclaw.json.
 webapp_allowed_user_ids:
-  - "1003656883486"
+  - "7183562118"
 
 # Which day counts as "today" when globbing the timeline dir. Must mirror the
 # tz that scripts/timeline.py writes with, or the app reads the wrong file.
