@@ -190,31 +190,55 @@
     scope: user
     daemon_reload: yes
 
-# GTasks Shopping (hourly scan -> inbox event)
-# Replaced the openclaw cron job "gtasks shopping import" (0e217866), which ran
-# an agent turn unconditionally at 06:00 daily. This posts an inbox event only
-# when the scan finds candidates, so idle days cost no agent run.
-- name: Template openclaw-gtasks-shopping service
+# My Docs Sweep (daily housekeeping scan -> inbox event)
+# One runner for every ad-hoc check over the my-docs editing clone: it posts a
+# single inbox event so the agent does one pull/commit/push pass, and posts
+# nothing at all on a quiet morning. Add checks to the script, not new timers.
+- name: Template openclaw-my-docs-sweep service
   template:
-    src: openclaw-gtasks-shopping.service.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.service"
+    src: openclaw-my-docs-sweep.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-my-docs-sweep.service"
     mode: '0644'
   notify: Reload systemd user
 
-- name: Template openclaw-gtasks-shopping timer
+- name: Template openclaw-my-docs-sweep timer
   template:
-    src: openclaw-gtasks-shopping.timer.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.timer"
+    src: openclaw-my-docs-sweep.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-my-docs-sweep.timer"
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start openclaw-gtasks-shopping timer
+- name: Enable and start openclaw-my-docs-sweep timer
   systemd:
-    name: openclaw-gtasks-shopping.timer
+    name: openclaw-my-docs-sweep.timer
     enabled: yes
     state: started
     scope: user
     daemon_reload: yes
+
+# GTasks Shopping: retired 2026-08-17. The hourly scan-and-post was absorbed into
+# openclaw-my-docs-sweep as one of its checks — both wanted to commit to the same
+# clone, so separate timers raced. Cadence drops from hourly to once each morning.
+- name: Ensure openclaw-gtasks-shopping timer is stopped and disabled
+  systemd:
+    name: openclaw-gtasks-shopping.timer
+    enabled: no
+    state: stopped
+    scope: user
+    daemon_reload: yes
+  failed_when: false
+
+- name: Remove openclaw-gtasks-shopping timer unit
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.timer"
+    state: absent
+  notify: Reload systemd user
+
+- name: Remove openclaw-gtasks-shopping service unit
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.service"
+    state: absent
+  notify: Reload systemd user
 
 # Obsidian Sync (headless continuous)
 

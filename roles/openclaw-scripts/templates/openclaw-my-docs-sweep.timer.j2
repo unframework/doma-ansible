@@ -1,0 +1,12 @@
+[Unit]
+Description=Sweep my-docs each morning and report anything left behind
+
+[Timer]
+# After the :00 my-docs refresh, so the clone state is current, and after the
+# 06:00 "Timeline morning triage" cron turn, so the two don't contend for the
+# main session. The event wakes the agent, so once a day is the whole point.
+OnCalendar={{ my_docs_sweep_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Report my-docs housekeeping findings to the agent as an inbox event
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ ansible_env.HOME }}/.openclaw/workspace
+ExecStart=/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/my-docs-sweep.py --clone {{ my_docs_clone_dir }} --min-age-hours {{ my_docs_sweep_min_age_hours }} --max-files {{ my_docs_sweep_max_files }}
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+# The scan is read-only git inspection plus one local HTTP post; nothing here
+# reaches an external API, so it has no reason to outlive a minute or two.
+TimeoutStartSec=5min
+
+[Install]
+WantedBy=default.target

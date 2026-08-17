@@ -10,8 +10,15 @@ betterstack_heartbeats: {}
 # Kept here rather than hardcoded in the script so the path stays config, not code.
 my_docs_clone_dir: "{{ ansible_env.HOME }}/.openclaw/my-docs"
 
-# Hourly at :00, ahead of openclaw-gtasks-shopping at :10, which reads the result.
+# Hourly at :00, ahead of openclaw-my-docs-sweep, which reads the refreshed clone.
 my_docs_pull_schedule: "*:00"
+
+# Daily housekeeping pass over the clone, reported to the agent as an inbox event.
+# Files untouched for under an hour are skipped so a live session mid-edit is left
+# alone; the file cap keeps one bad morning from filling the event with noise.
+my_docs_sweep_schedule: "06:20"
+my_docs_sweep_min_age_hours: 1
+my_docs_sweep_max_files: 10
 
 # qmd search collections. Notion points at the editing clone (not the sync
 # remote) so search results map to files the agent can actually edit. Note this
