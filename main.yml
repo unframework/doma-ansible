@@ -6,7 +6,7 @@
   vars_files:
     - vars/secrets.yml
   roles:
-    - vector
+    - { role: vector, tags: ['vector'] }
 
 # OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync
 - hosts: openclaw_host
