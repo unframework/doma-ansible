@@ -144,6 +144,32 @@
     scope: user
     daemon_reload: yes
 
+# GTasks Shopping (hourly scan -> inbox event)
+# Replaced the openclaw cron job "gtasks shopping import" (0e217866), which ran
+# an agent turn unconditionally at 06:00 daily. This posts an inbox event only
+# when the scan finds candidates, so idle days cost no agent run.
+- name: Template openclaw-gtasks-shopping service
+  template:
+    src: openclaw-gtasks-shopping.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-gtasks-shopping timer
+  template:
+    src: openclaw-gtasks-shopping.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start openclaw-gtasks-shopping timer
+  systemd:
+    name: openclaw-gtasks-shopping.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes
+
 # Obsidian Sync (headless continuous)
 
 - name: Ensure obsidian-headless (ob) CLI is installed globally
