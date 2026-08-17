@@ -1,0 +1,9 @@
+---
+# OpenClaw scripts role defaults
+
+# The my-docs editing clone: the agent's read/write surface for ledger content.
+# Kept here rather than hardcoded in the script so the path stays config, not code.
+my_docs_clone_dir: "{{ ansible_env.HOME }}/.openclaw/my-docs"
+
+# Hourly at :00, ahead of openclaw-gtasks-shopping at :10, which reads the result.
+my_docs_pull_schedule: "*:00"

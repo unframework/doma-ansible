@@ -98,24 +98,51 @@
     state: absent
   notify: Reload systemd user
 
-# SQ Import (Notion todos)
-- name: Template openclaw-sq-import service
-  template:
-    src: openclaw-sq-import.service.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.service"
-    mode: '0644'
-  notify: Reload systemd user
-
-- name: Template openclaw-sq-import timer
-  template:
-    src: openclaw-sq-import.timer.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.timer"
-    mode: '0644'
-  notify: Reload systemd user
-
-- name: Enable and start openclaw-sq-import timer
+# SQ Import (Notion todos): retired 2026-08-17. sq-import-todos.py was unused and
+# has been deleted; leaving the timer would fire a missing script every 6h.
+- name: Ensure openclaw-sq-import timer is stopped and disabled
   systemd:
     name: openclaw-sq-import.timer
+    enabled: no
+    state: stopped
+    scope: user
+    daemon_reload: yes
+  failed_when: false
+
+- name: Remove openclaw-sq-import timer unit
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.timer"
+    state: absent
+  notify: Reload systemd user
+
+- name: Remove openclaw-sq-import service unit
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.service"
+    state: absent
+  notify: Reload systemd user
+
+# My-Docs Pull (hourly clone refresh)
+# Replaces ledger-fetch-all on the sync remote. A fetch from the clone consults
+# remote.origin.uploadpack, which runs fetch-all.py on the remote — so this one
+# timer both refreshes upstream state and keeps the clone (the agent's read/write
+# surface) current. Carries the qmd reindex that ledger-fetch-all.service used to do.
+- name: Template openclaw-my-docs-pull service
+  template:
+    src: openclaw-my-docs-pull.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-my-docs-pull.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-my-docs-pull timer
+  template:
+    src: openclaw-my-docs-pull.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-my-docs-pull.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start openclaw-my-docs-pull timer
+  systemd:
+    name: openclaw-my-docs-pull.timer
     enabled: yes
     state: started
     scope: user

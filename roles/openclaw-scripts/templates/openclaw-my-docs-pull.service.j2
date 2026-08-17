@@ -1,0 +1,19 @@
+[Unit]
+Description=Refresh the my-docs editing clone (and upstream ledger state)
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ ansible_env.HOME }}/.openclaw/workspace
+ExecStart={{ ansible_env.HOME }}/.openclaw/workspace/scripts/my-docs-pull.sh {{ my_docs_clone_dir }}
+# The fetch runs fetch-all.py on the sync remote, which refreshes the qmd
+# source tree; reindex afterwards. Moved here from ledger-fetch-all.service
+# when that timer was retired.
+ExecStartPost=/bin/bash -c 'export PATH="{{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:$PATH" && qmd update && qmd embed'
+Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+# A cold full fetch on the remote can be slow; the sync worker has its own
+# 20-minute safety timeout, so allow a little more than that.
+TimeoutStartSec=25min
+
+[Install]
+WantedBy=default.target

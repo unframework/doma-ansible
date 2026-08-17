@@ -1,9 +1,10 @@
 [Unit]
-Description=Scan for shopping tasks hourly, 10 min after the ledger fetch
+Description=Scan for shopping tasks hourly, 10 min after the my-docs refresh
 
 [Timer]
-# ledger-fetch-all runs at :00 and refreshes ~/ledger-data/gtasks/main.yaml,
-# which is what the scan reads. Offset so we scan freshly-synced data.
+# openclaw-my-docs-pull runs at :00 and refreshes
+# ~/.openclaw/my-docs/gtasks/main.yaml, which is what the scan reads.
+# Offset so we scan freshly-synced data.
 OnCalendar=*:10
 Persistent=true
 

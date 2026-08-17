@@ -1,0 +1,13 @@
+[Unit]
+Description=Refresh my-docs hourly
+
+[Timer]
+# Runs at :00. This is the only thing that refreshes upstream ledger state now
+# that ledger-fetch-all is retired: the fetch consults remote.origin.uploadpack,
+# which runs fetch-all.py on the sync remote. openclaw-gtasks-shopping fires at
+# :10 and reads the result, so keep this ahead of it.
+OnCalendar={{ my_docs_pull_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target
