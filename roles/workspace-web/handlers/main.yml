@@ -6,6 +6,6 @@
 
 - name: Restart workspace-web
   ansible.builtin.systemd:
-    name: workspace-web.service
+    name: openclaw-workspace-web.service
     state: restarted
     scope: user

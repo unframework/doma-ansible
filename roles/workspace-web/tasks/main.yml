@@ -39,18 +39,18 @@
     state: directory
     mode: '0755'
 
-- name: Template workspace-web.service unit
+- name: Template openclaw-workspace-web.service unit
   ansible.builtin.template:
-    src: workspace-web.service.j2
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/workspace-web.service"
+    src: openclaw-workspace-web.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-workspace-web.service"
     mode: '0644'
   notify:
     - Reload systemd user
     - Restart workspace-web
 
-- name: Enable and start workspace-web user service
+- name: Enable and start openclaw-workspace-web user service
   ansible.builtin.systemd:
-    name: workspace-web.service
+    name: openclaw-workspace-web.service
     enabled: true
     state: started
     scope: user
