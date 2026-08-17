@@ -1,0 +1,32 @@
+---
+# herd defaults — systemd user unit for the herd agent session server, plus
+# tailnet-only exposure via Tailscale Serve.
+#
+# The herd bundle itself (~/.local/lib/herd/{server,ui}) is NOT managed here —
+# it is pushed out-of-band with `yarn herd:deploy`. This role only owns the
+# unit, its env, and the Tailscale Serve mapping.
+
+# Where `yarn herd:deploy` lands the bundle.
+herd_install_dir: "{{ ansible_env.HOME }}/.local/lib/herd"
+
+# Node version the server runs against. Must be installed under nvm — the
+# `dev` role's dev_extra_node_versions keeps it there.
+herd_node_version: "v24.18.0"
+
+# Server bind. Stays on loopback; Tailscale Serve is the only way in.
+herd_port: 8787
+herd_bind_host: "127.0.0.1"
+
+# Tailscale Serve: HTTPS on the tailnet name, tailnet-only (never Funnel).
+# Requires HTTPS certificates enabled for the tailnet in the admin console.
+#
+# 8443 rather than 443: on plankton the tailnet root (443) is already the
+# OpenClaw gateway, and `tailscale serve --https=443` would silently replace
+# that mapping. Keeping herd on its own port makes the role safe to run on any
+# host regardless of what already owns 443.
+herd_tailscale_serve: true
+herd_tailscale_https_port: 8443
+
+# Env PATH for the service — herd shells out to `claude`, which needs node and
+# ~/.local/bin on PATH. Single string, same convention as openclaw_service_path.
+herd_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_version }}/bin:{{ ansible_env.HOME }}/.local/bin:/usr/local/bin:/usr/bin:/bin"

@@ -28,6 +28,13 @@
   roles:
     - { role: workspace-web, tags: ['workspace-web'] }
 
+# Herd agent session server (sandy only)
+- hosts: herd_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: herd, tags: ['herd'] }
+
 - hosts: plankton.local
   gather_facts: no
   become: yes

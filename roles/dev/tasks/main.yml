@@ -32,6 +32,24 @@
     executable: /bin/bash
   when: not dev_node_stat.stat.exists
 
+- name: Check whether extra node versions are already installed under nvm
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ item }}/bin/node"
+  loop: "{{ dev_extra_node_versions }}"
+  register: dev_extra_node_stat
+
+- name: Install extra node versions via nvm (only if missing)
+  ansible.builtin.shell: |
+    export NVM_DIR="$HOME/.nvm"
+    . "$NVM_DIR/nvm.sh"
+    nvm install {{ item.item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ dev_extra_node_stat.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: not item.stat.exists
+
 # ---------------------------------------------------------------------------
 # yoclaude alias in ~/.bashrc
 # ---------------------------------------------------------------------------

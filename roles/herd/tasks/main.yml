@@ -1,0 +1,96 @@
+---
+# herd — systemd user unit for the herd agent session server + Tailscale Serve.
+# The bundle under herd_install_dir is deployed out-of-band (`yarn herd:deploy`).
+
+- name: Check that the herd bundle is present
+  ansible.builtin.stat:
+    path: "{{ herd_install_dir }}/server/herd-server.cjs"
+  register: herd_bundle_stat
+
+- name: Fail early if the herd bundle has not been deployed
+  ansible.builtin.fail:
+    msg: >-
+      {{ herd_install_dir }}/server/herd-server.cjs is missing.
+      Run `yarn herd:deploy` against this host first — Ansible does not ship the bundle.
+  when: not herd_bundle_stat.stat.exists
+
+- name: Check that the pinned node version is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_version }}/bin/node"
+  register: herd_node_stat
+
+- name: Fail early if the pinned node version is missing
+  ansible.builtin.fail:
+    msg: "node {{ herd_node_version }} not installed under nvm — run the `dev` role first."
+  when: not herd_node_stat.stat.exists
+
+- name: Ensure user systemd directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template herd.service unit
+  ansible.builtin.template:
+    src: herd.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/herd.service"
+    mode: '0644'
+  notify:
+    - Reload systemd user
+    - Restart herd
+
+- name: Enable and start herd user service
+  ansible.builtin.systemd:
+    name: herd.service
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true
+
+# ---------------------------------------------------------------------------
+# Tailscale Serve — tailnet-only HTTPS in front of the loopback listener.
+# NOT Funnel: herd runs Claude with the user's credentials and can execute code,
+# so it must never be reachable from the public internet.
+# Serve writes need root (no tailscale operator user is set on these hosts).
+# ---------------------------------------------------------------------------
+
+- name: Read current Tailscale serve config
+  ansible.builtin.command: tailscale serve status --json
+  register: herd_serve_status
+  changed_when: false
+  failed_when: false
+  become: true
+  when: herd_tailscale_serve | bool
+
+# Web keys look like "<magicdns-name>:<port>", each with Handlers keyed by path.
+# Match on the port AND the backend: a bare substring search for the backend URL
+# cannot tell "already on the right port" from "still on the old one", so the
+# role would never converge after herd_tailscale_https_port changes.
+- name: Collect HTTPS ports currently proxying to herd
+  ansible.builtin.set_fact:
+    herd_serve_ports: >-
+      {{ ((((herd_serve_status.stdout | default('') | trim) or '{}') | from_json).get('Web') or {})
+         | dict2items
+         | selectattr('value.Handlers', 'defined')
+         | selectattr('value.Handlers', 'contains', '/')
+         | selectattr('value.Handlers./.Proxy', 'defined')
+         | selectattr('value.Handlers./.Proxy', 'equalto', 'http://' ~ herd_bind_host ~ ':' ~ herd_port)
+         | map(attribute='key') | map('regex_replace', '^.*:', '') | list }}
+  when: herd_tailscale_serve | bool
+
+- name: Configure Tailscale Serve for herd (tailnet-only HTTPS)
+  ansible.builtin.command:
+    cmd: "tailscale serve --bg --https={{ herd_tailscale_https_port }} {{ herd_port }}"
+  become: true
+  when:
+    - herd_tailscale_serve | bool
+    - (herd_tailscale_https_port | string) not in herd_serve_ports
+
+# Only ever tears down mappings whose backend is herd's own loopback port, so
+# unrelated Serve entries on the host (e.g. the OpenClaw gateway) are untouched.
+- name: Remove stale herd Serve mappings on other ports
+  ansible.builtin.command:
+    cmd: "tailscale serve --https={{ item }} off"
+  become: true
+  loop: "{{ herd_serve_ports | default([]) | difference([herd_tailscale_https_port | string]) }}"
+  when: herd_tailscale_serve | bool

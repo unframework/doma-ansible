@@ -6,6 +6,11 @@
 dev_nvm_version: "v0.39.7"          # nvm installer script version (only used if nvm absent)
 dev_node_version: "v22.21.1"        # default node version managed via nvm
 
+# Additional node versions to keep installed under nvm alongside dev_node_version.
+# v24.18.0 is what the herd server runs against (see the `herd` role).
+dev_extra_node_versions:
+  - "v24.18.0"
+
 # Claude Code CLI — use the official installer script, which manages its own version.
 # Setting to "latest" leaves the existing install untouched if already present.
 dev_install_claude: true

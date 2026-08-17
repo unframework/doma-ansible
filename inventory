@@ -7,6 +7,9 @@ sandy.local    ansible_user=mmatants ansible_connection=ssh
 # At cutover, remove plankton.local and keep only sandy.local here.
 [openclaw_host]
 plankton.local
+
+# Host running the herd agent session server (tailnet-only via Tailscale Serve).
+[herd_host]
 sandy.local
 
 # Host running the workspace web Mini App. Must be the host holding

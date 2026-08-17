@@ -1,0 +1,21 @@
+[Unit]
+Description=Herd agent session server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ herd_install_dir }}/server
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_version }}/bin/node {{ herd_install_dir }}/server/herd-server.cjs
+Restart=on-failure
+RestartSec=2
+Environment=HOME={{ ansible_env.HOME }}
+Environment=TMPDIR=/tmp
+Environment=PATH={{ herd_service_path }}
+Environment=HERD_PORT={{ herd_port }}
+Environment=HERD_HOST={{ herd_bind_host }}
+Environment=HERD_UI_DIST={{ herd_install_dir }}/ui
+Environment=HERD_CLAUDE_BIN={{ ansible_env.HOME }}/.local/bin/claude
+
+[Install]
+WantedBy=default.target
