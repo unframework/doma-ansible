@@ -76,51 +76,6 @@
     scope: user
     daemon_reload: yes
 
-# Main Session Reset: retired 2026-07-09. Replaced with agents.defaults.session.resetByType.direct in openclaw.json.
-- name: Ensure openclaw-main-session-reset timer is stopped and disabled
-  systemd:
-    name: openclaw-main-session-reset.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
-  failed_when: false
-
-- name: Remove openclaw-main-session-reset timer unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-main-session-reset.timer"
-    state: absent
-  notify: Reload systemd user
-
-- name: Remove openclaw-main-session-reset service unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-main-session-reset.service"
-    state: absent
-  notify: Reload systemd user
-
-# SQ Import (Notion todos): retired 2026-08-17. sq-import-todos.py was unused and
-# has been deleted; leaving the timer would fire a missing script every 6h.
-- name: Ensure openclaw-sq-import timer is stopped and disabled
-  systemd:
-    name: openclaw-sq-import.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
-  failed_when: false
-
-- name: Remove openclaw-sq-import timer unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.timer"
-    state: absent
-  notify: Reload systemd user
-
-- name: Remove openclaw-sq-import service unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-import.service"
-    state: absent
-  notify: Reload systemd user
-
 # qmd search index config
 # Was hand-maintained at ~/.config/qmd/index.yml until 2026-08-17; brought under
 # Ansible when the Notion collection was repointed from the sync remote to the
@@ -215,30 +170,6 @@
     state: started
     scope: user
     daemon_reload: yes
-
-# GTasks Shopping: retired 2026-08-17. The hourly scan-and-post was absorbed into
-# openclaw-my-docs-sweep as one of its checks — both wanted to commit to the same
-# clone, so separate timers raced. Cadence drops from hourly to once each morning.
-- name: Ensure openclaw-gtasks-shopping timer is stopped and disabled
-  systemd:
-    name: openclaw-gtasks-shopping.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
-  failed_when: false
-
-- name: Remove openclaw-gtasks-shopping timer unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.timer"
-    state: absent
-  notify: Reload systemd user
-
-- name: Remove openclaw-gtasks-shopping service unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-gtasks-shopping.service"
-    state: absent
-  notify: Reload systemd user
 
 # Obsidian Sync (headless continuous)
 

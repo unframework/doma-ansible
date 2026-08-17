@@ -5,32 +5,6 @@
     state: directory
     mode: '0755'
 
-# Fetch-all: retired 2026-08-17. The hourly refresh is now driven from the
-# my-docs editing clone (openclaw-my-docs-pull.timer in the openclaw-scripts
-# role) — a fetch there consults remote.origin.uploadpack, which runs
-# fetch-all.py here anyway, and additionally keeps the clone current. The qmd
-# reindex that used to hang off this unit's ExecStartPost moved there too.
-- name: Ensure ledger-fetch-all timer is stopped and disabled
-  systemd:
-    name: ledger-fetch-all.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
-  failed_when: false
-
-- name: Remove ledger-fetch-all timer unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-fetch-all.timer"
-    state: absent
-  notify: Reload systemd user
-
-- name: Remove ledger-fetch-all service unit
-  file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-fetch-all.service"
-    state: absent
-  notify: Reload systemd user
-
 - name: Template ledger-push service
   template:
     src: ledger-push.service.j2
