@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+# Managed by Ansible: roles/openclaw-scripts (qmd_collections in defaults/main.yml).
+# Edit there and re-run the playbook — local edits here will be overwritten.
+#
+# Reindexed hourly by openclaw-my-docs-pull.service (qmd update && qmd embed).
+# After changing a collection path, run `qmd update` to pick it up immediately.
+collections:
+{% for name, collection in qmd_collections | dictsort %}
+  {{ name }}:
+    path: {{ collection.path }}
+    pattern: "{{ collection.pattern }}"
+{% endfor %}

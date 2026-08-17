@@ -121,6 +121,24 @@
     state: absent
   notify: Reload systemd user
 
+# qmd search index config
+# Was hand-maintained at ~/.config/qmd/index.yml until 2026-08-17; brought under
+# Ansible when the Notion collection was repointed from the sync remote to the
+# editing clone. No reindex handler on purpose: openclaw-my-docs-pull runs
+# `qmd update` hourly, and running it from Ansible would need node on PATH and
+# would fail on hosts where qmd isn't installed.
+- name: Ensure qmd config directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/qmd"
+    state: directory
+    mode: '0755'
+
+- name: Template qmd index config
+  template:
+    src: qmd-index.yml.j2
+    dest: "{{ ansible_env.HOME }}/.config/qmd/index.yml"
+    mode: '0644'
+
 # My-Docs Pull (hourly clone refresh)
 # Replaces ledger-fetch-all on the sync remote. A fetch from the clone consults
 # remote.origin.uploadpack, which runs fetch-all.py on the remote — so this one
