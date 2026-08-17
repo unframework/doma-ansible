@@ -1,6 +1,11 @@
 ---
 # OpenClaw scripts role defaults
 
+# Better Stack heartbeat URLs, keyed by job. A job whose key is absent simply
+# does not ping, so the playbook stays runnable before the monitor exists.
+# Real values live in vars/secrets.yml.
+betterstack_heartbeats: {}
+
 # The my-docs editing clone: the agent's read/write surface for ledger content.
 # Kept here rather than hardcoded in the script so the path stays config, not code.
 my_docs_clone_dir: "{{ ansible_env.HOME }}/.openclaw/my-docs"

@@ -5,7 +5,15 @@ After=network.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/timeline-tick.py
+{% if betterstack_heartbeats.timeline_tick is defined %}
+ExecStartPost=-/usr/bin/curl -fsS --max-time 10 -o /dev/null {{ betterstack_heartbeats.timeline_tick }}
+{% endif %}
 Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
+
+# Drops systemd's own Starting/Finished pair on every run. This does not reach
+# the script's stdout, which journald stores regardless of priority, so
+# timeline-tick.py suppresses its own per-minute chatter.
+LogLevelMax=notice
 
 [Install]
 WantedBy=default.target

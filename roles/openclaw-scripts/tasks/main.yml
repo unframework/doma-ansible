@@ -171,7 +171,8 @@
   template:
     src: openclaw-timeline-tick.service.j2
     dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-timeline-tick.service"
-    mode: '0644'
+    # Embeds the heartbeat capability URL.
+    mode: '0600'
   notify: Reload systemd user
 
 - name: Template openclaw-timeline-tick timer
