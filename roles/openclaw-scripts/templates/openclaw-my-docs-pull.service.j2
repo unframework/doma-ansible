@@ -6,6 +6,12 @@ After=network.target
 Type=oneshot
 WorkingDirectory={{ ansible_env.HOME }}/.openclaw/workspace
 ExecStart={{ ansible_env.HOME }}/.openclaw/workspace/scripts/my-docs-pull.sh {{ my_docs_clone_dir }}
+# Reports today's calendar commits to the agent as an inbox event. Ordered
+# ahead of the qmd line because that one has no `-` prefix, and a failing
+# ExecStartPost makes systemd skip every later one. `-` here so a gateway
+# outage can't mask this unit's own health signal, which is "did upstream
+# refresh" — failures still show up in the journal.
+ExecStartPost=-/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/gcal-watch.py --clone {{ my_docs_clone_dir }}
 # The fetch runs fetch-all.py on the sync remote, which refreshes the qmd
 # source tree; reindex afterwards. Moved here from ledger-fetch-all.service
 # when that timer was retired.
