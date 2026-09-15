@@ -28,6 +28,22 @@
   roles:
     - { role: workspace-web, tags: ['workspace-web'] }
 
+# Containerised PBX (sandy only; plankton's hand-built Asterisk 16 is untouched)
+- hosts: asterisk_host
+  gather_facts: yes
+  become: no
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - { role: asterisk, tags: ['asterisk'] }
+
+# Home Assistant + Music Assistant compose stack (sandy only)
+- hosts: docker_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: docker-stack, tags: ['docker-stack'] }
+
 # Herd agent session server (sandy only)
 - hosts: herd_host
   gather_facts: yes

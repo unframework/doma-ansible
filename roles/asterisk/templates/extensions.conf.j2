@@ -1,0 +1,16 @@
+; Managed by Ansible - do not edit directly
+[default]
+exten => _9XXX,1,Answer()
+same => n,Stasis({{ asterisk_stasis_app }})
+same => n,Hangup()
+
+exten => 9999,1,Answer()
+same => n,Stasis({{ asterisk_stasis_app }})
+same => n,Hangup()
+
+exten => 1001,1,Answer()
+same => n,Playback(hello-world)
+same => n,Hangup()
+
+exten => 301,1,Dial(PJSIP/mtdesk1,30)
+same => n,Hangup()

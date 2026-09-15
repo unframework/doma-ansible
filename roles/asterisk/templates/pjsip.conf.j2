@@ -1,0 +1,28 @@
+; Managed by Ansible - do not edit directly
+[transport-udp]
+type=transport
+protocol=udp
+bind=0.0.0.0
+{% for ep in asterisk_endpoints %}
+
+[{{ ep.id }}]
+type=endpoint
+context=default
+disallow=all
+allow={{ ep.codecs }}
+auth={{ ep.id }}
+aors={{ ep.id }}
+{% if ep.callerid is defined %}
+callerid={{ ep.callerid }}
+{% endif %}
+
+[{{ ep.id }}]
+type=auth
+auth_type=userpass
+username={{ ep.id }}
+password={{ asterisk_endpoint_passwords[ep.id] }}
+
+[{{ ep.id }}]
+type=aor
+max_contacts={{ ep.max_contacts }}
+{% endfor %}

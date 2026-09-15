@@ -1,0 +1,43 @@
+---
+- name: Fail early if Asterisk credentials are missing from the vault
+  ansible.builtin.fail:
+    msg: >-
+      asterisk_ari_password and asterisk_endpoint_passwords
+      ({{ asterisk_endpoints | map(attribute='id') | join(', ') }})
+      must be defined in vars/secrets.yml.
+  when: >-
+    asterisk_ari_password is not defined
+    or asterisk_endpoints | rejectattr('id', 'in', asterisk_endpoint_passwords | default({})) | list | length > 0
+
+- name: Ensure Asterisk config directory exists
+  ansible.builtin.file:
+    path: "{{ asterisk_dir }}/config"
+    state: directory
+    mode: '0700'
+
+- name: Template Asterisk config
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ asterisk_dir }}/config/{{ item }}"
+    mode: '0600'
+  loop: "{{ asterisk_config_files }}"
+  notify: Restart asterisk
+
+- name: Template Asterisk compose file
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: "{{ asterisk_dir }}/docker-compose.yaml"
+    mode: '0644'
+  notify: Restart asterisk
+
+- name: Converge the PBX
+  ansible.builtin.command:
+    cmd: docker compose up --detach --remove-orphans
+    chdir: "{{ asterisk_dir }}"
+  become: true
+  register: asterisk_compose_up
+  changed_when: >-
+    'Started' in asterisk_compose_up.stderr
+    or 'Created' in asterisk_compose_up.stderr
+    or 'Recreated' in asterisk_compose_up.stderr
+  when: asterisk_active

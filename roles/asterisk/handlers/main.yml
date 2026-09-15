@@ -1,0 +1,7 @@
+---
+- name: Restart asterisk
+  ansible.builtin.command:
+    cmd: docker compose restart
+    chdir: "{{ asterisk_dir }}"
+  become: true
+  when: asterisk_active

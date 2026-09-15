@@ -1,0 +1,29 @@
+---
+# asterisk — containerised PBX. Debian dropped the asterisk server package in
+# trixie and there is no official Sangoma apt repo, so the service runs from a
+# pinned image with only the handful of config files we actually use overlaid
+# onto the image's stock set.
+
+asterisk_dir: "{{ ansible_env.HOME }}/asterisk"
+asterisk_image: "andrius/asterisk@sha256:5933f0f383857f7fa419f3d52ed66734582a43ba90adb5fafa674461cbacb9ad"
+
+# Host networking: SIP signalling and RTP need to reach LAN handsets directly.
+asterisk_ari_bind: 127.0.0.1
+asterisk_ari_port: 8088
+asterisk_ari_user: asterisk
+asterisk_stasis_app: openclaw
+
+# SIP endpoints. Passwords come from asterisk_endpoint_passwords in the vault,
+# keyed by id, so no credential lives in this repo in clear text.
+asterisk_endpoints:
+  - id: "300"
+    codecs: ulaw
+    max_contacts: 20
+  - id: mtdesk1
+    codecs: ulaw,alaw
+    callerid: '"Mitel Desk" <301>'
+    max_contacts: 1
+
+# Whether this host runs the PBX. Two Asterisks answering for the same handset
+# would fight over its registration, so this stays false until cutover.
+asterisk_active: false

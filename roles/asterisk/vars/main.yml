@@ -1,0 +1,9 @@
+---
+# Overlaid onto the image's stock /etc/asterisk; anything not listed keeps the
+# image default. Adding an entry means adding the matching template.
+asterisk_config_files:
+  - pjsip.conf
+  - extensions.conf
+  - ari.conf
+  - http.conf
+  - modules.conf

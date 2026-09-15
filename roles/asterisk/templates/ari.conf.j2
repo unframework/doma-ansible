@@ -1,0 +1,8 @@
+; Managed by Ansible - do not edit directly
+[general]
+enabled=yes
+
+[{{ asterisk_ari_user }}]
+type=user
+password={{ asterisk_ari_password }}
+password_format=plain
