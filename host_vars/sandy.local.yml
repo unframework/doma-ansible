@@ -27,3 +27,8 @@ vector_system_journal_units:
 # the Better Stack heartbeat or the Telegram long-poll would collide.
 openclaw_scripts_active: false
 openclaw_gateway_enabled: false
+
+# sandy ships to its own Better Stack source (sandy_server). Newer sources are
+# bound to a dedicated ingest host; the shared in.logs endpoint rejects their
+# tokens. Not a secret, so it lives here rather than in the vault.
+vector_betterstack_uri: "https://s2763957.us-west-2a.betterstackdata.com"
