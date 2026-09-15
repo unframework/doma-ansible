@@ -2,20 +2,34 @@
 plankton.local ansible_user=mmatants ansible_connection=local
 sandy.local    ansible_user=mmatants ansible_connection=ssh
 
-# Which host currently runs the OpenClaw gateway (+ companions).
-# During migration both hosts are members; sandy is exercised via role tags.
-# At cutover, remove plankton.local and keep only sandy.local here.
+# Which host currently runs the OpenClaw gateway (+ companions). During migration
+# both hosts are members; sandy is exercised via role tags. At cutover, remove
+# plankton.local and keep only sandy.local here.
 [openclaw_host]
+plankton.local
+
+# Host running the workspace web Mini App. Must be the host holding
+# ~/.openclaw/timeline and the bot token in ~/.openclaw/openclaw.json.
+[webapp_host]
 plankton.local
 
 # Host running the herd agent session server (tailnet-only via Tailscale Serve).
 [herd_host]
 sandy.local
 
-# Host running the workspace web Mini App. Must be the host holding
-# ~/.openclaw/timeline and the bot token in ~/.openclaw/openclaw.json.
-[webapp_host]
-plankton.local
+# sandy only, deliberately, and not a group that flips at cutover.
+# plankton's Asterisk 16 is a hand-built bullseye-era install that predates any
+# IaC; the role below provisions Asterisk 22 from Sangoma. Naming plankton here
+# would point a major-version upgrade at a live PBX. It stays hand-managed until
+# it is decommissioned.
+[asterisk_host]
+sandy.local
+
+# sandy only, for the same reason. plankton's compose stack is running but has
+# never been reconciled against the committed file since the HA version was
+# pinned, so applying the role there would recreate live containers.
+[docker_host]
+sandy.local
 
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3
