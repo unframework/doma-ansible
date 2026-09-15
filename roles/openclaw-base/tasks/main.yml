@@ -24,6 +24,13 @@
     mode: '0644'   # matches existing; ~/.config is 0700 so token is not exposed
   notify: Reload systemd user
 
+- name: Template openclaw runtime env
+  ansible.builtin.template:
+    src: state-env.j2
+    dest: "{{ ansible_env.HOME }}/.openclaw/.env"
+    mode: '0600'
+  notify: Restart openclaw gateway
+
 - name: Converge openclaw-gateway activation
   ansible.builtin.systemd:
     name: openclaw-gateway.service

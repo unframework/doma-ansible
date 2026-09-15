@@ -3,3 +3,10 @@
   ansible.builtin.systemd:
     daemon_reload: yes
     scope: user
+
+- name: Restart openclaw gateway
+  ansible.builtin.systemd:
+    name: openclaw-gateway.service
+    state: restarted
+    scope: user
+  when: openclaw_gateway_enabled
