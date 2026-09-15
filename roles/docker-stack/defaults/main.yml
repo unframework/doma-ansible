@@ -1,0 +1,19 @@
+---
+# docker-stack — Home Assistant + Music Assistant, deployed from the
+# plankton-docker repo. Ansible owns the host prerequisites and the stack
+# lifecycle; the compose file and its bind-mounted config stay in that repo.
+
+docker_stack_dir: "{{ ansible_env.HOME }}/plankton-docker"
+docker_stack_repo: "git@github.com:unframework/plankton-docker.git"
+docker_stack_version: main
+
+# State dirs bind-mounted into the containers. Root-owned and seeded by rsync
+# from the previous host — Ansible creates them but never populates them.
+docker_stack_state_dirs:
+  - /root/ha-config
+  - /root/ha-music
+
+# Whether this host runs the stack. Left false so applying the role never
+# starts a second Home Assistant against the same devices; flipped at cutover
+# once the first start has been watched by hand.
+docker_stack_active: false

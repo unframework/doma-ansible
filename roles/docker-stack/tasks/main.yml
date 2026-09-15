@@ -1,0 +1,73 @@
+---
+- name: Ensure apt keyring directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Ensure Docker apt repo key is present
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+  become: true
+
+- name: Ensure Docker apt repo is configured
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}
+      signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    filename: docker
+    state: present
+  become: true
+
+- name: Ensure Docker engine and compose plugin are installed
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure Docker starts at boot
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  become: true
+
+- name: Ensure the stack repo is checked out
+  ansible.builtin.git:
+    repo: "{{ docker_stack_repo }}"
+    dest: "{{ docker_stack_dir }}"
+    version: "{{ docker_stack_version }}"
+    update: true
+
+- name: Ensure container state directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  become: true
+  loop: "{{ docker_stack_state_dirs }}"
+
+- name: Validate the compose file
+  ansible.builtin.command:
+    cmd: docker compose config --quiet
+    chdir: "{{ docker_stack_dir }}"
+  become: true
+  changed_when: false
+
+- name: Converge the stack
+  ansible.builtin.command:
+    cmd: docker compose up --detach --remove-orphans
+    chdir: "{{ docker_stack_dir }}"
+  become: true
+  register: compose_up
+  changed_when: "'Started' in compose_up.stderr or 'Created' in compose_up.stderr or 'Recreated' in compose_up.stderr"
+  when: docker_stack_active
