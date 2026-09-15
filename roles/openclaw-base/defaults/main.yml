@@ -15,10 +15,28 @@ openclaw_node_version: "v22.21.1"
 # Systemd unit knobs. Defaults freeze plankton's current unit content.
 openclaw_service_version: "2026.3.2"    # baked into Description + OPENCLAW_SERVICE_VERSION
 openclaw_gateway_port: 18789
-openclaw_service_node_llama_gpu: false  # plankton has no GPU; sandy would set true
+# Requires a working NVIDIA driver, not merely a GPU. sandy has a Quadro T400
+# but no driver installed, so enabling this there would fail at startup.
+openclaw_service_node_llama_gpu: false
 
-# Env PATH — matches plankton's existing service. Kept as a single string
-# so future edits are explicit and reviewable.
-openclaw_service_path: "/home/mmatants/.nvm/current/bin:/home/mmatants/.local/bin:/home/mmatants/.npm-global/bin:/home/mmatants/bin:/home/mmatants/.volta/bin:/home/mmatants/.asdf/shims:/home/mmatants/.bun/bin:/home/mmatants/.fnm/current/bin:/home/mmatants/.local/share/pnpm:/usr/local/bin:/usr/bin:/bin"
+openclaw_service_path_dirs:
+  - "{{ ansible_env.HOME }}/.nvm/current/bin"
+  - "{{ ansible_env.HOME }}/.local/bin"
+  - "{{ ansible_env.HOME }}/.npm-global/bin"
+  - "{{ ansible_env.HOME }}/bin"
+  - "{{ ansible_env.HOME }}/.volta/bin"
+  - "{{ ansible_env.HOME }}/.asdf/shims"
+  - "{{ ansible_env.HOME }}/.bun/bin"
+  - "{{ ansible_env.HOME }}/.fnm/current/bin"
+  - "{{ ansible_env.HOME }}/.local/share/pnpm"
+  - /usr/local/bin
+  - /usr/bin
+  - /bin
+
+openclaw_service_path: "{{ openclaw_service_path_dirs | join(':') }}"
+
+# Whether the gateway runs on this host. False disables and stops it — the
+# posture for a host holding the workload only as a fallback.
+openclaw_gateway_enabled: true
 
 # openclaw_gateway_token: loaded from vaulted vars/secrets.yml
