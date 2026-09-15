@@ -6,7 +6,14 @@ vector_data_dir: "{{ ansible_env.HOME }}/.local/share/vector"
 
 # Better Stack logging endpoint
 vector_betterstack_uri: "https://in.logs.betterstack.com"
-# vector_betterstack_token loaded from vars/secrets.yml (encrypted)
+
+# Per-host Better Stack source tokens, keyed by vector_host_name. A host with its
+# own source ships there; anything absent here falls back to the shared token.
+# Separate sources keep hosts independently filterable and revocable.
+# Real values live in vars/secrets.yml.
+vector_betterstack_tokens: {}
+
+# vector_betterstack_token (shared fallback) loaded from vars/secrets.yml
 
 # Host identifier for logs
 vector_host_name: "plankton"

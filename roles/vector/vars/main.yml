@@ -1,0 +1,3 @@
+---
+vector_sink_token: >-
+  {{ vector_betterstack_tokens[vector_host_name] | default(vector_betterstack_token) }}
