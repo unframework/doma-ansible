@@ -1,6 +1,25 @@
 ---
 # OpenClaw scripts role defaults
 
+# Whether this host runs the openclaw companion workload. Setting it false parks
+# every unit below in a disabled+stopped state — the posture for a host that has
+# handed the workload off but stays available as a fallback.
+openclaw_scripts_active: true
+
+# Baseline activation per unit, ANDed with openclaw_scripts_active. A unit paused
+# here is paused in git rather than out-of-band, so a playbook run cannot silently
+# resurrect it. Override individual entries via openclaw_scripts_unit_overrides.
+openclaw_scripts_unit_defaults:
+  session-sweep.timer: true
+  openclaw-my-docs-pull.timer: true
+  openclaw-my-docs-sweep.timer: true
+  openclaw-timeline-tick.timer: true
+  obsidian-sync.service: true
+  debug-log-forwarder.timer: false      # 2026-08-07: too noisy in the Telegram debug topic
+  openclaw-sq-triage.timer: false       # 2026-07-08: paused
+
+openclaw_scripts_unit_overrides: {}
+
 # Better Stack heartbeat URLs, keyed by job. A job whose key is absent simply
 # does not ping, so the playbook stays runnable before the monitor exists.
 # Real values live in vars/secrets.yml.

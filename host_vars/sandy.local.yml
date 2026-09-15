@@ -21,3 +21,9 @@ vector_system_journal_units:
   - "ufw.service"
   - "unattended-upgrades.service"
   - "fail2ban.service"
+
+# Pre-seed posture: units are templated here so the host is ready, but nothing
+# runs until cutover. Two hosts sharing the my-docs clone, the ledger remote,
+# the Better Stack heartbeat or the Telegram long-poll would collide.
+openclaw_scripts_active: false
+openclaw_gateway_enabled: false

@@ -13,3 +13,10 @@ vector_file_sources:
 
 # plankton doesn't currently ship system journal
 vector_include_system_journal: false
+
+# Paused out-of-band on 2026-08-23 while Nick travelled. Recorded here so a
+# playbook run converges on the paused state instead of resurrecting the tick.
+# Resuming also needs ~/.openclaw/timeline/.tick-cursor reset to now, or the
+# whole paused stretch of markers replays into one turn.
+openclaw_scripts_unit_overrides:
+  openclaw-timeline-tick.timer: false

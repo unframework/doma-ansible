@@ -24,9 +24,10 @@
     mode: '0644'   # matches existing; ~/.config is 0700 so token is not exposed
   notify: Reload systemd user
 
-- name: Enable openclaw-gateway user service (do not force-start; existing state preserved)
+- name: Converge openclaw-gateway activation
   ansible.builtin.systemd:
     name: openclaw-gateway.service
-    enabled: true
+    enabled: "{{ openclaw_gateway_enabled }}"
+    state: "{{ omit if openclaw_gateway_enabled else 'stopped' }}"
     scope: user
     daemon_reload: true

@@ -20,14 +20,6 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start session-sweep timer
-  systemd:
-    name: session-sweep.timer
-    enabled: yes
-    state: started
-    scope: user
-    daemon_reload: yes
-
 # Debug Log Forwarder
 - name: Template debug-log-forwarder service
   template:
@@ -43,15 +35,6 @@
     mode: '0644'
   notify: Reload systemd user
 
-# Disabled 2026-08-07: paused per Nick — too noisy in Telegram debug topic. Flip back to enabled=yes/state=started to resume.
-- name: Disable and stop debug-log-forwarder timer
-  systemd:
-    name: debug-log-forwarder.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
-
 # SQ Triage Sub-agent
 - name: Template openclaw-sq-triage service
   template:
@@ -66,15 +49,6 @@
     dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-sq-triage.timer"
     mode: '0644'
   notify: Reload systemd user
-
-# Disabled 2026-07-08: paused per Nick. Flip back to enabled=yes/state=started to resume.
-- name: Disable and stop openclaw-sq-triage timer
-  systemd:
-    name: openclaw-sq-triage.timer
-    enabled: no
-    state: stopped
-    scope: user
-    daemon_reload: yes
 
 # qmd search index config
 # Was hand-maintained at ~/.config/qmd/index.yml until 2026-08-17; brought under
@@ -113,14 +87,6 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start openclaw-my-docs-pull timer
-  systemd:
-    name: openclaw-my-docs-pull.timer
-    enabled: yes
-    state: started
-    scope: user
-    daemon_reload: yes
-
 # Timeline Tick (per-minute marker reminder)
 - name: Template openclaw-timeline-tick service
   template:
@@ -136,14 +102,6 @@
     dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-timeline-tick.timer"
     mode: '0644'
   notify: Reload systemd user
-
-- name: Enable and start openclaw-timeline-tick timer
-  systemd:
-    name: openclaw-timeline-tick.timer
-    enabled: yes
-    state: started
-    scope: user
-    daemon_reload: yes
 
 # My Docs Sweep (daily housekeeping scan -> inbox event)
 # One runner for every ad-hoc check over the my-docs editing clone: it posts a
@@ -163,14 +121,6 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start openclaw-my-docs-sweep timer
-  systemd:
-    name: openclaw-my-docs-sweep.timer
-    enabled: yes
-    state: started
-    scope: user
-    daemon_reload: yes
-
 # Obsidian Sync (headless continuous)
 
 - name: Ensure obsidian-headless (ob) CLI is installed globally
@@ -189,10 +139,15 @@
     mode: '0644'
   notify: Reload systemd user
 
-- name: Enable and start obsidian-sync service
-  systemd:
-    name: obsidian-sync.service
-    enabled: yes
-    state: started
+- name: Apply pending unit file changes before activation
+  ansible.builtin.meta: flush_handlers
+
+- name: Converge companion unit activation
+  ansible.builtin.systemd:
+    name: "{{ item.key }}"
+    enabled: "{{ item.value and openclaw_scripts_active }}"
+    state: "{{ 'started' if (item.value and openclaw_scripts_active) else 'stopped' }}"
     scope: user
-    daemon_reload: yes
+  loop: "{{ openclaw_scripts_unit_activation | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
