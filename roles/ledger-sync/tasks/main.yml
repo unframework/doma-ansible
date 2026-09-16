@@ -1,4 +1,10 @@
 ---
+- name: Template ledger tooling env
+  ansible.builtin.template:
+    src: ledger-env.j2
+    dest: "{{ ansible_env.HOME }}/ledger-data/.env"
+    mode: '0600'
+
 - name: Ensure user systemd directory exists
   file:
     path: "{{ ansible_env.HOME }}/.config/systemd/user"
