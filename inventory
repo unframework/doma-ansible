@@ -19,7 +19,11 @@ sandy.local
 plankton.local
 
 # Host running the herd agent session server (tailnet-only via Tailscale Serve).
+# Deliberately BOTH hosts, running in parallel. Each node serves on its own
+# tailnet name, so the :8443 mappings do not collide. herd is how agent
+# sessions reach the box — disabling it on a host cuts off live sessions there.
 [herd_host]
+plankton.local
 sandy.local
 
 # sandy only, deliberately, and not a group that flips at cutover.

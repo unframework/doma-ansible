@@ -32,3 +32,8 @@ openclaw_gateway_enabled: false
 # bound to a dedicated ingest host; the shared in.logs endpoint rejects their
 # tokens. Not a secret, so it lives here rather than in the vault.
 vector_betterstack_uri: "https://s2763957.us-west-2a.betterstackdata.com"
+
+# HA + Music Assistant cut over to sandy on 2026-09-16, when the Zigbee dongle
+# was physically moved. plankton's stack is stopped and cannot run without the
+# radio.
+docker_stack_active: true
