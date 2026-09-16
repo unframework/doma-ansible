@@ -1,0 +1,52 @@
+---
+- name: Ensure tftpd-hpa is installed
+  ansible.builtin.apt:
+    name: tftpd-hpa
+    state: present
+  become: true
+
+- name: Check that the firmware archive is present
+  ansible.builtin.stat:
+    path: "{{ tftpd_payload_archive }}"
+  register: tftpd_archive
+
+- name: Fail early if the firmware archive is missing
+  ansible.builtin.fail:
+    msg: >-
+      {{ tftpd_payload_archive }} is missing. It is vendor firmware, not tracked
+      in git — copy it to this host before applying the role.
+  when: not tftpd_archive.stat.exists
+
+- name: Ensure the TFTP root exists
+  ansible.builtin.file:
+    path: "{{ tftpd_directory }}"
+    state: directory
+    owner: tftp
+    group: tftp
+    mode: '0755'
+  become: true
+
+- name: Unpack the firmware payload
+  ansible.builtin.unarchive:
+    src: "{{ tftpd_payload_archive }}"
+    dest: "{{ tftpd_payload_dest }}"
+    remote_src: true
+    owner: tftp
+    group: tftp
+    creates: "{{ tftpd_directory }}/{{ tftpd_payload_marker }}"
+  become: true
+
+- name: Template tftpd-hpa config
+  ansible.builtin.template:
+    src: tftpd-hpa.j2
+    dest: /etc/default/tftpd-hpa
+    mode: '0644'
+  become: true
+  notify: Restart tftpd
+
+- name: Ensure tftpd-hpa is enabled and running
+  ansible.builtin.service:
+    name: tftpd-hpa
+    enabled: true
+    state: started
+  become: true

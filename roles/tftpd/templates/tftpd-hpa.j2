@@ -1,0 +1,5 @@
+# Managed by Ansible - do not edit directly
+TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="{{ tftpd_directory }}"
+TFTP_ADDRESS="{{ tftpd_address }}"
+TFTP_OPTIONS="{{ ([('--secure' if tftpd_secure else ''), ('--verbose' if tftpd_verbose else '')] | select | list) | join(' ') }}"

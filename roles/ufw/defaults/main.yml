@@ -1,0 +1,33 @@
+---
+# ufw — host firewall. plankton ran with no firewall at all, so every LAN
+# service it exposed needs an explicit rule here once that workload moves.
+# Rules are declared additively; the role never purges, so an error cannot
+# lock the host out.
+
+ufw_lan_subnet: "192.168.1.0/24"
+
+# Services reachable from anywhere (including the tailnet interface rule, which
+# is what makes the gateway, herd and Mini App work without LAN exposure).
+ufw_global_rules:
+  - { rule: allow, port: "22", proto: tcp, comment: "OpenSSH" }
+  - { rule: allow, port: "5353", proto: udp, comment: "mDNS" }
+
+# Services reachable only from the local network.
+ufw_lan_rules:
+  - { rule: allow, port: "8123", proto: tcp, comment: "Home Assistant UI/API" }
+  - { rule: allow, port: "1900", proto: udp, comment: "SSDP for upnp" }
+  - { rule: allow, port: "5568", proto: udp, comment: "sACN from LED runner" }
+  - { rule: allow, port: "5060", proto: udp, comment: "Asterisk SIP signalling" }
+  - { rule: allow, port: "10000:20000", proto: udp, comment: "Asterisk RTP audio" }
+  - { rule: allow, port: "69", proto: udp, comment: "TFTP Mitel firmware" }
+  - { rule: allow, port: "8095", proto: tcp, comment: "Music Assistant web/api" }
+  - { rule: allow, port: "8097", proto: tcp, comment: "Music Assistant" }
+  - { rule: allow, port: "9000", proto: tcp, comment: "Music Assistant streams" }
+  - { rule: allow, port: "9090", proto: tcp, comment: "Music Assistant" }
+  - { rule: allow, port: "3483", proto: tcp, comment: "Music Assistant SlimProto" }
+  - { rule: allow, port: "3483", proto: udp, comment: "Music Assistant SlimProto discovery" }
+
+# TFTP negotiates its data transfer on an ephemeral port, so conntrack needs the
+# helper to relate that back to the original request.
+ufw_conntrack_modules:
+  - nf_conntrack_tftp

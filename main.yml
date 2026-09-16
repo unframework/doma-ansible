@@ -37,6 +37,20 @@
   roles:
     - { role: asterisk, tags: ['asterisk'] }
 
+# Host firewall
+- hosts: firewall_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: ufw, tags: ['ufw'] }
+
+# TFTP firmware server for the Mitel desk phone
+- hosts: tftp_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: tftpd, tags: ['tftpd'] }
+
 # Home Assistant + Music Assistant compose stack (sandy only)
 - hosts: docker_host
   gather_facts: yes

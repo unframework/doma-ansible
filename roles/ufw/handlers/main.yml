@@ -1,0 +1,7 @@
+---
+- name: Load conntrack helpers
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  become: true
+  loop: "{{ ufw_conntrack_modules }}"

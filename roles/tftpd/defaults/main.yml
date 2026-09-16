@@ -1,0 +1,24 @@
+---
+# tftpd — read-only TFTP server for Mitel desk phone firmware. The phone fetches
+# boot images from here; its own settings live on the handset, so this matters
+# at firmware upgrade and factory reset rather than every boot.
+
+tftpd_directory: /srv/tftp
+tftpd_address: ":69"
+
+# --secure chroots to tftpd_directory. --verbose logs every transfer, which is
+# the only way to see whether the phone actually fetches anything; off by
+# default to match the hand-built setup's log volume.
+tftpd_secure: true
+tftpd_verbose: false
+
+# Vendor firmware, 83 MB across 68 files. Too big and too binary for git, so the
+# archive itself is the artifact of record and Ansible only unpacks it.
+tftpd_payload_archive: "{{ ansible_env.HOME }}/.openclaw/mitel-tftp.zip"
+
+# A file present in the archive, used to tell whether it has been unpacked.
+tftpd_payload_marker: ASU_MAIN.img
+
+# The archive contains a single top-level "tftp/" directory, so it unpacks into
+# the parent and lands as tftpd_directory itself.
+tftpd_payload_dest: "{{ tftpd_directory | dirname }}"

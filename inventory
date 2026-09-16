@@ -40,5 +40,16 @@ sandy.local
 [docker_host]
 sandy.local
 
+# TFTP server for the Mitel desk phone's firmware. Moving with the PBX so
+# plankton can eventually be retired; the phone must be pointed at sandy's
+# address (DHCP option 66 or the handset's own config) for this to take effect.
+[tftp_host]
+sandy.local
+
+# Hosts with a managed host firewall. sandy only: plankton runs with no firewall
+# at all, and enabling default-deny there would cut off its remaining services.
+[firewall_host]
+sandy.local
+
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3

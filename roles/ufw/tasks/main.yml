@@ -1,0 +1,50 @@
+---
+- name: Ensure ufw is installed
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  become: true
+
+- name: Allow globally reachable services
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    comment: "{{ item.comment }}"
+  become: true
+  loop: "{{ ufw_global_rules }}"
+  loop_control:
+    label: "{{ item.port }}/{{ item.proto }} {{ item.comment }}"
+
+- name: Allow LAN-only services
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    src: "{{ ufw_lan_subnet }}"
+    comment: "{{ item.comment }}"
+  become: true
+  loop: "{{ ufw_lan_rules }}"
+  loop_control:
+    label: "{{ item.port }}/{{ item.proto }} {{ item.comment }}"
+
+- name: Allow anything arriving over the tailnet
+  community.general.ufw:
+    rule: allow
+    interface: tailscale0
+    direction: in
+    comment: Tailscale
+  become: true
+
+- name: Load conntrack helpers at boot
+  ansible.builtin.copy:
+    content: "{{ ufw_conntrack_modules | join('\n') }}\n"
+    dest: /etc/modules-load.d/conntrack-helpers.conf
+    mode: '0644'
+  become: true
+  notify: Load conntrack helpers
+
+- name: Ensure ufw is enabled
+  community.general.ufw:
+    state: enabled
+  become: true
