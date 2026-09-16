@@ -7,10 +7,9 @@
   become: true
 
 - name: Ensure Docker apt repo key is present
-  ansible.builtin.get_url:
-    url: https://download.docker.com/linux/debian/gpg
-    dest: /etc/apt/keyrings/docker.asc
-    mode: '0644'
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && chmod 0644 /etc/apt/keyrings/docker.asc
+    creates: /etc/apt/keyrings/docker.asc
   become: true
 
 - name: Ensure Docker apt repo is configured
