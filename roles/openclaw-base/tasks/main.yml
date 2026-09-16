@@ -35,6 +35,6 @@
   ansible.builtin.systemd:
     name: openclaw-gateway.service
     enabled: "{{ openclaw_gateway_enabled }}"
-    state: "{{ omit if openclaw_gateway_enabled else 'stopped' }}"
+    state: "{{ 'started' if openclaw_gateway_enabled else 'stopped' }}"
     scope: user
     daemon_reload: true

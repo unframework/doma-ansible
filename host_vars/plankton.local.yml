@@ -20,3 +20,9 @@ vector_include_system_journal: false
 # whole paused stretch of markers replays into one turn.
 openclaw_scripts_unit_overrides:
   openclaw-timeline-tick.timer: false
+
+# Workload cut over to sandy 2026-09-16. Units stay templated here so the host
+# can be brought back, but nothing runs. herd is deliberately excluded — it is
+# in herd_host and keeps running on both boxes.
+openclaw_scripts_active: false
+openclaw_gateway_enabled: false
