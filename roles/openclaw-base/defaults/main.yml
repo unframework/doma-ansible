@@ -35,6 +35,13 @@ openclaw_service_path_dirs:
 
 openclaw_service_path: "{{ openclaw_service_path_dirs | join(':') }}"
 
+# Tailscale Serve in front of the loopback gateway. Tailnet-only, never Funnel:
+# the gateway is the agent's full control surface. This was hand-made on
+# plankton and owned by no role, which is why it kept getting lost.
+openclaw_tailscale_serve: true
+openclaw_tailscale_https_port: 443
+openclaw_bind_host: "127.0.0.1"
+
 # Whether the gateway runs on this host. False disables and stops it — the
 # posture for a host holding the workload only as a fallback.
 openclaw_gateway_enabled: true
