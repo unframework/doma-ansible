@@ -235,3 +235,15 @@
     state: present
   become: true
   when: dev_install_adb | bool
+
+- name: Ensure global npm CLIs are installed at pinned versions
+  community.general.npm:
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    global: true
+    executable: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ dev_node_version }}/bin/npm"
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ dev_node_version }}/bin:{{ ansible_env.PATH }}"
+  loop: "{{ dev_global_npm_packages }}"
+  loop_control:
+    label: "{{ item.name }}"

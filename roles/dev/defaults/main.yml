@@ -34,3 +34,20 @@ dev_install_adb: true
 
 # yoclaude alias — dangerous-permissions wrapper for claude
 dev_yoclaude_alias: "alias yoclaude='claude --dangerously-skip-permissions'"
+
+# Global npm CLIs the openclaw companion units and deploy scripts invoke.
+# qmd in particular is called by openclaw-my-docs-pull's ExecStartPost without
+# a "-" prefix, so the unit hard-fails on a host that lacks it.
+dev_global_npm_packages:
+  - name: "@tobilu/qmd"
+    version: "1.0.7"
+  - name: ntn
+    version: "0.16.0"
+  - name: yarn
+    version: "1.22.22"
+  - name: pnpm
+    version: "10.30.3"
+  - name: portless
+    version: "0.11.1"
+  - name: eas-cli
+    version: "18.0.1"
