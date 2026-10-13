@@ -1,0 +1,9 @@
+---
+# drone-server — on-demand systemd user units for the generative audio engine.
+# The repo itself is a git checkout on the host, not shipped by Ansible.
+
+drone_server_dir: "{{ ansible_env.HOME }}/drone-server"
+
+# Seconds of silence before the engine exits, and of a lost output sink before it is stopped.
+drone_server_idle_exit: 600
+drone_server_output_grace: 120

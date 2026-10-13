@@ -1,0 +1,7 @@
+[Unit]
+Description=drone-server cast to %I
+BindsTo=drone-engine.service
+After=drone-engine.service
+
+[Service]
+ExecStart={{ drone_server_dir }}/cast.sh "%I"

@@ -1,0 +1,8 @@
+[Unit]
+Description=drone-server output watchdog
+BindsTo=drone-engine.service
+After=drone-engine.service
+
+[Service]
+ExecStart={{ drone_server_dir }}/watch-output.sh
+Environment=OUTPUT_GRACE={{ drone_server_output_grace }}

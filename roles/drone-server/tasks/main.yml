@@ -1,0 +1,29 @@
+---
+- name: Install OSC CLI tools
+  ansible.builtin.apt:
+    name: liblo-tools
+    state: present
+  become: true
+
+- name: Ensure user systemd directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template drone-server units
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/{{ item }}"
+    mode: '0644'
+  loop:
+    - drone-engine.service
+    - drone-watch.service
+    - drone-cast@.service
+  notify: Reload systemd user
+
+- name: Link dronectl onto PATH
+  ansible.builtin.file:
+    src: "{{ drone_server_dir }}/ctl.sh"
+    dest: "{{ ansible_env.HOME }}/.local/bin/dronectl"
+    state: link

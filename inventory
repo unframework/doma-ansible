@@ -51,5 +51,9 @@ sandy.local
 [firewall_host]
 sandy.local
 
+# Host running the drone-server audio engine (the box with the speakers).
+[drone_host]
+sandy.local
+
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3

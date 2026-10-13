@@ -65,6 +65,13 @@
   roles:
     - { role: herd, tags: ['herd'] }
 
+# drone-server generative audio engine, on-demand user units (sandy only)
+- hosts: drone_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: drone-server, tags: ['drone-server'] }
+
 - hosts: plankton.local
   gather_facts: no
   become: yes
