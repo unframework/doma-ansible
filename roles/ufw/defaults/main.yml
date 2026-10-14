@@ -26,6 +26,8 @@ ufw_lan_rules:
   - { rule: allow, port: "9090", proto: tcp, comment: "Music Assistant" }
   - { rule: allow, port: "3483", proto: tcp, comment: "Music Assistant SlimProto" }
   - { rule: allow, port: "3483", proto: udp, comment: "Music Assistant SlimProto discovery" }
+  - { rule: allow, port: "57120", proto: udp, comment: "drone-server OSC and SuperDirt" }
+  - { rule: allow, port: "8000", proto: tcp, comment: "drone-server Icecast stream for Chromecast" }
 
 # TFTP negotiates its data transfer on an ephemeral port, so conntrack needs the
 # helper to relate that back to the original request.
