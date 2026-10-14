@@ -33,6 +33,13 @@
     msg: "webapp_allowed_user_ids is empty — the app would 401 every request."
   when: (webapp_allowed_user_ids | default([]) | length) == 0
 
+# openclaw.json stores the token as ${TELEGRAM_BOT_TOKEN}; the server expands it
+# from the env, so an unset var means every initData check fails as bad_signature.
+- name: Fail early if the Telegram bot token is missing from the vault
+  ansible.builtin.fail:
+    msg: "openclaw_state_env.TELEGRAM_BOT_TOKEN is not defined — add it to vars/secrets.yml (ansible-vault edit)."
+  when: (openclaw_state_env.TELEGRAM_BOT_TOKEN | default('')) | length == 0
+
 - name: Ensure user systemd directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/systemd/user"

@@ -28,6 +28,8 @@
   roles:
     - { role: workspace-web, tags: ['workspace-web'] }
 
+  vars_files:
+    - vars/secrets.yml
 # Containerised PBX (sandy only; plankton's hand-built Asterisk 16 is untouched)
 - hosts: asterisk_host
   gather_facts: yes

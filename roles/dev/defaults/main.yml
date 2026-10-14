@@ -32,6 +32,13 @@ dev_gmsaas_version: "1.15.0"
 # handled manually per host (they're quirky one-offs).
 dev_install_adb: true
 
+# gogcli (openclaw/gogcli) — Google Workspace CLI. No apt repo or Homebrew on
+# the box and a source build needs Go 1.26+, so we drop the released
+# linux_amd64 GoReleaser binary into ~/.local/bin. The tarball holds one
+# binary named `gog`.
+dev_install_gogcli: true
+dev_gogcli_version: "0.42.0"
+
 # yoclaude alias — dangerous-permissions wrapper for claude
 dev_yoclaude_alias: "alias yoclaude='claude --dangerously-skip-permissions'"
 

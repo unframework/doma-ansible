@@ -19,6 +19,7 @@ Environment=WEBAPP_ALLOWED_USER_IDS={{ webapp_allowed_user_ids | join(',') }}
 Environment=WEBAPP_TIMELINE_DIR={{ webapp_timeline_dir }}
 Environment=WEBAPP_TIMEZONE={{ webapp_timezone }}
 Environment=WEBAPP_OPENCLAW_CONFIG={{ webapp_openclaw_config }}
+Environment=TELEGRAM_BOT_TOKEN={{ openclaw_state_env.TELEGRAM_BOT_TOKEN }}
 
 [Install]
 WantedBy=default.target

@@ -247,3 +247,23 @@
   loop: "{{ dev_global_npm_packages }}"
   loop_control:
     label: "{{ item.name }}"
+
+# ---------------------------------------------------------------------------
+# gogcli (openclaw/gogcli) — Google Workspace CLI
+# ---------------------------------------------------------------------------
+# Prebuilt GoReleaser binary from GitHub releases installed into ~/.local/bin
+# (matches the claude/gmsaas layout). The tarball contains a single binary `gog`.
+
+- name: Install gogcli prebuilt binary (only if missing)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    tmp="$(mktemp -d)"
+    curl -fsSL -o "$tmp/gogcli.tar.gz" \
+      "https://github.com/openclaw/gogcli/releases/download/v{{ dev_gogcli_version }}/gogcli_{{ dev_gogcli_version }}_linux_amd64.tar.gz"
+    tar -xzf "$tmp/gogcli.tar.gz" -C "$tmp" ./gog
+    install -D -m 0755 "$tmp/gog" "{{ ansible_env.HOME }}/.local/bin/gog"
+    rm -rf "$tmp"
+  args:
+    executable: /bin/bash
+    creates: "{{ ansible_env.HOME }}/.local/bin/gog"
+  when: dev_install_gogcli | bool
