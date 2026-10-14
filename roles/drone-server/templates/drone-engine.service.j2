@@ -1,5 +1,5 @@
 [Unit]
-Description=drone-server engine (drone, rain, thunder layers)
+Description=drone-server engine (drone, rain, thunder, SuperDirt layers)
 Wants=drone-watch.service
 
 [Service]
@@ -7,7 +7,7 @@ Type=notify
 NotifyAccess=all
 WorkingDirectory={{ drone_server_dir }}
 ExecStartPre={{ drone_server_dir }}/rain-prep.sh
-ExecStart={{ drone_server_dir }}/engine.sh engine 57130 engine.scd
+ExecStart={{ drone_server_dir }}/engine.sh engine 57120 engine.scd
 Environment=IDLE_EXIT={{ drone_server_idle_exit }}
 TimeoutStartSec=60
 Restart=on-failure

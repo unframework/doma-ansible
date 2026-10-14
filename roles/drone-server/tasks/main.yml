@@ -1,7 +1,11 @@
 ---
-- name: Install OSC CLI tools
+- name: Install SuperCollider, its plugins, and OSC CLI tools
   ansible.builtin.apt:
-    name: liblo-tools
+    name:
+      - supercollider-server
+      - supercollider-language
+      - sc3-plugins
+      - liblo-tools
     state: present
   become: true
 
