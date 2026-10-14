@@ -1,0 +1,10 @@
+---
+- name: Publish mDNS only on the LAN-facing interfaces, not docker/tailscale
+  community.general.ini_file:
+    path: /etc/avahi/avahi-daemon.conf
+    section: server
+    option: allow-interfaces
+    value: "{{ avahi_allow_interfaces | join(',') }}"
+    no_extra_spaces: true
+  become: true
+  notify: Restart avahi-daemon

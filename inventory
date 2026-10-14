@@ -53,5 +53,10 @@ sandy.local
 [drone_host]
 sandy.local
 
+# Hosts whose avahi publishes only on the LAN interface, so <host>.local does
+# not resolve to a docker bridge address. sandy only; plankton is left as-is.
+[avahi_host]
+sandy.local
+
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3

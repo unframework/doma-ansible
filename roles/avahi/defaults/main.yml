@@ -1,0 +1,3 @@
+---
+avahi_allow_interfaces:
+  - "{{ ansible_default_ipv4.interface }}"

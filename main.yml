@@ -7,6 +7,14 @@
     - vars/secrets.yml
   roles:
     - { role: vector, tags: ['vector'] }
+    - { role: known-hosts, tags: ['known-hosts'] }
+
+# mDNS publishing (sandy only; plankton's avahi is left as-is)
+- hosts: avahi_host
+  gather_facts: yes
+  become: no
+  roles:
+    - { role: avahi, tags: ['avahi'] }
 
 # OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync.
 # Live on sandy; plankton is still a member but its units are templated inactive

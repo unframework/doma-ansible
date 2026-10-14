@@ -1,0 +1,9 @@
+---
+- name: Trust each reachable doma host's ed25519 key under its inventory and short names
+  ansible.builtin.known_hosts:
+    name: "{{ hostvars[item.0][item.1] }}"
+    key: "{{ hostvars[item.0][item.1] }} {{ hostvars[item.0].ansible_ssh_host_key_ed25519_public_keytype }} {{ hostvars[item.0].ansible_ssh_host_key_ed25519_public }}"
+    hash_host: true
+  loop: "{{ ansible_play_hosts | product(['inventory_hostname', 'ansible_hostname']) | list }}"
+  loop_control:
+    label: "{{ hostvars[item.0][item.1] }}"
