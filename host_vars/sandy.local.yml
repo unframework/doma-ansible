@@ -2,15 +2,13 @@
 # sandy-specific vector settings
 vector_host_name: sandy
 
-# No user-service filter yet — sandy currently has no openclaw/ledger/obsidian
-# When those get added, list substrings here to filter user units
+# User units to ship (substring match)
 vector_log_unit_filters:
   - "openclaw"
   - "ledger-"
   - "obsidian"
   - "herd"
 
-# No custom file sources yet
 vector_file_sources:
   - name: "ledger"
     path: "{{ ansible_env.HOME }}/ledger-data/.git/ledger/sync.log"
@@ -28,9 +26,9 @@ vector_system_journal_units:
   - "unattended-upgrades.service"
   - "fail2ban.service"
 
-# Pre-seed posture: units are templated here so the host is ready, but nothing
-# runs until cutover. Two hosts sharing the my-docs clone, the ledger remote,
-# the Better Stack heartbeat or the Telegram long-poll would collide.
+# Live gateway host since the 2026-09-16 cutover. Only one host may have these
+# on: two hosts sharing the my-docs clone, the ledger remote, the Better Stack
+# heartbeat or the Telegram long-poll would collide (plankton has them off).
 openclaw_scripts_active: true
 openclaw_gateway_enabled: true
 

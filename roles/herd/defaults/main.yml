@@ -20,7 +20,7 @@ herd_bind_host: "127.0.0.1"
 # Tailscale Serve: HTTPS on the tailnet name, tailnet-only (never Funnel).
 # Requires HTTPS certificates enabled for the tailnet in the admin console.
 #
-# 8443 rather than 443: on plankton the tailnet root (443) is already the
+# 8443 rather than 443: on the gateway host the tailnet root (443) is the
 # OpenClaw gateway, and `tailscale serve --https=443` would silently replace
 # that mapping. Keeping herd on its own port makes the role safe to run on any
 # host regardless of what already owns 443.

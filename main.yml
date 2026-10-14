@@ -8,7 +8,9 @@
   roles:
     - { role: vector, tags: ['vector'] }
 
-# OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync
+# OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync.
+# Live on sandy; plankton is still a member but its units are templated inactive
+# via host_vars until it is retired.
 - hosts: openclaw_host
   gather_facts: yes
   become: no
@@ -20,16 +22,17 @@
     - { role: openclaw-scripts, tags: ['openclaw-scripts'] }
     - { role: ledger-sync, tags: ['ledger-sync'] }
 
-# Workspace web — Telegram Mini App timeline server (plankton only; it needs
-# the openclaw timeline data + bot token that live on the gateway host)
+# Workspace web — Telegram Mini App timeline server (sandy; it needs the
+# openclaw timeline data that lives on the gateway host, and the bot token from
+# the vault)
 - hosts: webapp_host
   gather_facts: yes
   become: no
+  vars_files:
+    - vars/secrets.yml
   roles:
     - { role: workspace-web, tags: ['workspace-web'] }
 
-  vars_files:
-    - vars/secrets.yml
 # Containerised PBX (sandy only; plankton's hand-built Asterisk 16 is untouched)
 - hosts: asterisk_host
   gather_facts: yes
@@ -60,7 +63,7 @@
   roles:
     - { role: docker-stack, tags: ['docker-stack'] }
 
-# Herd agent session server (sandy only)
+# Herd agent session server (both hosts, in parallel)
 - hosts: herd_host
   gather_facts: yes
   become: no

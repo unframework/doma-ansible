@@ -1,20 +1,18 @@
 [doma]
-plankton.local ansible_user=mmatants ansible_connection=local
-sandy.local    ansible_user=mmatants ansible_connection=ssh
+plankton.local ansible_user=mmatants ansible_connection=ssh
+sandy.local    ansible_user=mmatants ansible_connection=local
 
-# Which host currently runs the OpenClaw gateway (+ companions). During migration
-# both hosts are members; sandy is exercised via role tags. At cutover, remove
-# plankton.local and keep only sandy.local here.
+# Hosts carrying the OpenClaw gateway (+ companions). Cut over to sandy on
+# 2026-09-16; sandy is the live gateway. plankton stays a member until it is
+# retired so its units remain templated, but host_vars/plankton.local.yml sets
+# openclaw_scripts_active and openclaw_gateway_enabled to false so nothing runs
+# there. When retiring plankton, drop it from here.
 [openclaw_host]
 plankton.local
-# Added for pre-seed: sandy needs dev/openclaw-base/openclaw-scripts applied
-# before cutover. Safe because host_vars/sandy.local.yml sets
-# openclaw_scripts_active and openclaw_gateway_enabled to false, so membership
-# templates the units without starting anything.
 sandy.local
 
-# Host running the workspace web Mini App. Must be the host holding
-# ~/.openclaw/timeline and the bot token in ~/.openclaw/openclaw.json.
+# Host running the workspace web Mini App. Must be the live gateway host, which
+# holds ~/.openclaw/timeline and ~/.openclaw/openclaw.json.
 [webapp_host]
 sandy.local
 

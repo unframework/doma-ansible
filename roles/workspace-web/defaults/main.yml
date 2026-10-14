@@ -53,6 +53,6 @@ webapp_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ webapp_node_v
 # is an auth bypass, so rotating it means redeploying, not just editing config.
 webapp_funnel: true
 
-# Funnel only accepts 443, 8443 and 10000. On plankton 443 is the OpenClaw
+# Funnel only accepts 443, 8443 and 10000. On the gateway host 443 is the OpenClaw
 # gateway and 8443 is herd, so 10000 is the one free slot.
 webapp_funnel_port: 10000
