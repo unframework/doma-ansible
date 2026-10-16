@@ -1,6 +1,6 @@
 ---
 # herd — systemd user unit for the herd agent session server + Tailscale Serve.
-# The bundle under herd_install_dir is deployed out-of-band (`yarn herd:deploy`).
+# The bundle under herd_install_dir is deployed out-of-band (`yarn deploy` (in ~/herd)).
 
 - name: Check that the herd bundle is present
   ansible.builtin.stat:
@@ -11,7 +11,7 @@
   ansible.builtin.fail:
     msg: >-
       {{ herd_install_dir }}/server/herd-server.cjs is missing.
-      Run `yarn herd:deploy` against this host first — Ansible does not ship the bundle.
+      Run `yarn deploy` (in ~/herd) against this host first — Ansible does not ship the bundle.
   when: not herd_bundle_stat.stat.exists
 
 - name: Check that the pinned node version is installed

@@ -3,10 +3,10 @@
 # tailnet-only exposure via Tailscale Serve.
 #
 # The herd bundle itself (~/.local/lib/herd/{server,ui}) is NOT managed here —
-# it is pushed out-of-band with `yarn herd:deploy`. This role only owns the
+# it is pushed out-of-band with `yarn deploy` (in ~/herd). This role only owns the
 # unit, its env, and the Tailscale Serve mapping.
 
-# Where `yarn herd:deploy` lands the bundle.
+# Where `yarn deploy` (in ~/herd) lands the bundle.
 herd_install_dir: "{{ ansible_env.HOME }}/.local/lib/herd"
 
 # Node version the server runs against. Must be installed under nvm — the
