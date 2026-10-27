@@ -8,7 +8,8 @@ data_dir = "{{ vector_data_dir }}"
 type = "journald"
 current_boot_only = true
 # include_units doesn't work for user services (_SYSTEMD_USER_UNIT)
-# Filter in transform instead if a filter list is set
+# Filter in transform instead if a filter list is set; USER_UNIT carries
+# systemd's own messages about a unit (start/finish/failure), logged by init.scope
 
 {% if vector_include_system_journal | default(false) %}
 # --- System journald source ---
@@ -51,7 +52,8 @@ type = "filter"
 inputs = ["journald_user"]
 condition = '''
 {% for filter in vector_log_unit_filters %}
-contains(to_string(._SYSTEMD_USER_UNIT) ?? "", "{{ filter }}"){{ " ||" if not loop.last else "" }}
+contains(to_string(._SYSTEMD_USER_UNIT) ?? "", "{{ filter }}") ||
+contains(to_string(.USER_UNIT) ?? "", "{{ filter }}"){{ " ||" if not loop.last else "" }}
 {% endfor %}
 
 '''
