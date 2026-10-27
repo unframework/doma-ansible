@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync ledger data with upstream services (apply pending, then fetch)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory={{ ledger_data_dir }}
+ExecStart={{ ledger_engine_bin }} sync
+# The worker has its own 20-minute safety timeout; allow a little more.
+TimeoutStartSec=25min

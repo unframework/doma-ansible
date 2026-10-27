@@ -1,5 +1,5 @@
 [Unit]
-Description=Refresh the my-docs editing clone (and upstream ledger state)
+Description=Fast-forward the my-docs editing clone onto the sync remote
 After=network.target
 
 [Service]
@@ -9,16 +9,12 @@ ExecStart={{ ansible_env.HOME }}/.openclaw/workspace/scripts/my-docs-pull.sh {{ 
 # Reports today's calendar commits to the agent as an inbox event. Ordered
 # ahead of the qmd line because that one has no `-` prefix, and a failing
 # ExecStartPost makes systemd skip every later one. `-` here so a gateway
-# outage can't mask this unit's own health signal, which is "did upstream
+# outage can't mask this unit's own health signal, which is "did the clone
 # refresh" — failures still show up in the journal.
 ExecStartPost=-/usr/bin/python3 {{ ansible_env.HOME }}/.openclaw/workspace/scripts/gcal-watch.py --clone {{ my_docs_clone_dir }}
-# The script's LEDGER_SYNC=1 fetch runs a sync on the sync remote, which
-# refreshes the qmd source tree; reindex afterwards.
+# The fast-forward refreshes the qmd source tree; reindex afterwards.
 ExecStartPost=/bin/bash -c 'export PATH="{{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:$PATH" && qmd update && qmd embed'
 Environment="PATH={{ ansible_env.HOME }}/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/usr/bin:/bin"
-# A cold full fetch on the remote can be slow; the sync worker has its own
-# 20-minute safety timeout, so allow a little more than that.
-TimeoutStartSec=25min
 
 [Install]
 WantedBy=default.target

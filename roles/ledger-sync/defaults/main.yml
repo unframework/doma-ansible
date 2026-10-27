@@ -2,6 +2,8 @@
 # Ledger sync role defaults
 
 ledger_data_dir: "{{ ansible_env.HOME }}/ledger-data"
-# ledger_fetch_schedule removed 2026-08-17 with ledger-fetch-all; the hourly
-# refresh now runs from the clone (my_docs_pull_schedule in openclaw-scripts).
+ledger_engine_bin: "{{ ansible_env.HOME }}/ledger-engine/.venv/bin/ledger"
+# Hourly at :00, ahead of my_docs_pull_schedule (openclaw-scripts), which
+# fast-forwards the editing clone onto the result.
+ledger_sync_schedule: "*:00"
 ledger_push_schedule: "*-*-* 00/12:00:00"

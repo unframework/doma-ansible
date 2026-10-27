@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync ledger data with upstream services periodically
+
+[Timer]
+OnCalendar={{ ledger_sync_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

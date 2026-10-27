@@ -32,3 +32,25 @@
     state: started
     scope: user
     daemon_reload: yes
+
+- name: Template ledger-sync service
+  template:
+    src: ledger-sync.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-sync.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template ledger-sync timer
+  template:
+    src: ledger-sync.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ledger-sync.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Enable and start ledger-sync timer
+  systemd:
+    name: ledger-sync.timer
+    enabled: yes
+    state: started
+    scope: user
+    daemon_reload: yes

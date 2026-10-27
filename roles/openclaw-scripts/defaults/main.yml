@@ -29,8 +29,8 @@ betterstack_heartbeats: {}
 # Kept here rather than hardcoded in the script so the path stays config, not code.
 my_docs_clone_dir: "{{ ansible_env.HOME }}/.openclaw/my-docs"
 
-# Hourly at :00, ahead of openclaw-my-docs-sweep, which reads the refreshed clone.
-my_docs_pull_schedule: "*:00"
+# Hourly at :05, after ledger-sync (ledger-sync role) lands upstream state at :00.
+my_docs_pull_schedule: "*:05"
 
 # Daily housekeeping pass over the clone, reported to the agent as an inbox event.
 # Files untouched for under an hour are skipped so a live session mid-edit is left
