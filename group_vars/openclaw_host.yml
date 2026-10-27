@@ -1,0 +1,5 @@
+---
+# Ledger paths shared by ledger-sync (the sync remote and its timers) and
+# openclaw-scripts (the editing clone, whose fetches run the engine).
+ledger_data_dir: "{{ ansible_env.HOME }}/ledger-data"
+ledger_engine_bin: "{{ ansible_env.HOME }}/ledger-engine/.venv/bin/ledger"

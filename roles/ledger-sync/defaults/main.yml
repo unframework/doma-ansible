@@ -1,8 +1,6 @@
 ---
 # Ledger sync role defaults
 
-ledger_data_dir: "{{ ansible_env.HOME }}/ledger-data"
-ledger_engine_bin: "{{ ansible_env.HOME }}/ledger-engine/.venv/bin/ledger"
 # Hourly at :00, ahead of my_docs_pull_schedule (openclaw-scripts), which
 # fast-forwards the editing clone onto the result.
 ledger_sync_schedule: "*:00"

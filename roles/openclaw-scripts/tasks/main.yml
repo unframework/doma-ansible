@@ -68,11 +68,34 @@
     dest: "{{ ansible_env.HOME }}/.config/qmd/index.yml"
     mode: '0644'
 
+# My-docs editing clone: the agent's read/write surface over the ledger sync
+# remote. A plain clone with no hooks, no .env and no GitHub remote. Only
+# created when missing; an existing clone just has its config keys enforced.
+- name: Check for the ledger sync remote
+  stat:
+    path: "{{ ledger_data_dir }}/.git"
+  register: ledger_data_git
+
+- name: Clone the ledger sync remote as the my-docs editing clone
+  command: git clone {{ ledger_data_dir }} {{ my_docs_clone_dir }}
+  args:
+    creates: "{{ my_docs_clone_dir }}/.git"
+  when: ledger_data_git.stat.exists
+
+- name: Configure the my-docs editing clone
+  community.general.git_config:
+    repo: "{{ my_docs_clone_dir }}"
+    scope: local
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - { name: remote.origin.uploadpack, value: "{{ ledger_engine_bin }} upload-pack" }
+    - { name: pull.ff, value: only }
+  when: ledger_data_git.stat.exists
+
 # My-Docs Pull (hourly clone refresh)
-# Replaces ledger-fetch-all on the sync remote. A fetch from the clone consults
-# remote.origin.uploadpack, which runs fetch-all.py on the remote — so this one
-# timer both refreshes upstream state and keeps the clone (the agent's read/write
-# surface) current. Carries the qmd reindex that ledger-fetch-all.service used to do.
+# Fast-forwards the clone onto the sync remote after ledger-sync.timer has
+# refreshed it, and carries the qmd reindex.
 - name: Template openclaw-my-docs-pull service
   template:
     src: openclaw-my-docs-pull.service.j2
