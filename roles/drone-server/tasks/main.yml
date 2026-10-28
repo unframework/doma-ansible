@@ -9,6 +9,20 @@
     state: present
   become: true
 
+- name: Let the audio group acquire realtime scheduling through RTKit without a local seat
+  ansible.builtin.copy:
+    dest: /etc/polkit-1/rules.d/50-rtkit-audio.rules
+    content: |
+      polkit.addRule(function (action, subject) {
+        if (action.id == "org.freedesktop.RealtimeKit1.acquire-real-time" && subject.isInGroup("audio")) {
+          return polkit.Result.YES;
+        }
+      });
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
 - name: Ensure user systemd directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/systemd/user"
