@@ -1,0 +1,14 @@
+[Unit]
+Description=drone-server web panel
+After=pipewire.service wireplumber.service
+
+[Service]
+WorkingDirectory={{ drone_server_dir }}/web
+ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/{{ drone_server_node_version }}/bin/node dist/server.cjs
+Environment=DRONE_WEB_PORT={{ drone_server_web_port }}
+Environment=DRONE_WEB_HOST={{ drone_server_web_host }}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

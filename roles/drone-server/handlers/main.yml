@@ -3,3 +3,10 @@
   ansible.builtin.systemd:
     daemon_reload: yes
     scope: user
+
+- name: Restart drone-web
+  ansible.builtin.systemd:
+    name: drone-web.service
+    state: restarted
+    scope: user
+  when: drone_web_bundle.stat.exists | default(false)

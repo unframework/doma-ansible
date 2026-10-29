@@ -7,3 +7,9 @@ drone_server_dir: "{{ ansible_env.HOME }}/drone-server"
 # Seconds of silence before the engine exits, and of a lost output sink before it is stopped.
 drone_server_idle_exit: 600
 drone_server_output_grace: 120
+
+# drone-web — the browser control panel (web/ in the repo), LAN-open and unauthenticated like OSC on 57120.
+# The bundle is built in the checkout with `npm run build` in web/, not by Ansible.
+drone_server_web_port: 8790
+drone_server_web_host: "0.0.0.0"
+drone_server_node_version: "v24.18.0"

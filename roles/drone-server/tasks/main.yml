@@ -38,10 +38,32 @@
     - drone-engine.service
     - drone-watch.service
     - drone-cast@.service
-  notify: Reload systemd user
+    - drone-web.service
+  notify:
+    - Reload systemd user
+    - Restart drone-web
 
 - name: Link dronectl onto PATH
   ansible.builtin.file:
     src: "{{ drone_server_dir }}/ctl.sh"
     dest: "{{ ansible_env.HOME }}/.local/bin/dronectl"
     state: link
+
+- name: Check that the drone-web bundle is built
+  ansible.builtin.stat:
+    path: "{{ drone_server_dir }}/web/dist/server.cjs"
+  register: drone_web_bundle
+
+- name: Enable and start drone-web
+  ansible.builtin.systemd:
+    name: drone-web.service
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true
+  when: drone_web_bundle.stat.exists
+
+- name: Remind to build drone-web
+  ansible.builtin.debug:
+    msg: "drone-web not started: run `npm ci && npm run build` in {{ drone_server_dir }}/web, then re-run the playbook."
+  when: not drone_web_bundle.stat.exists
