@@ -9,3 +9,4 @@
     name: herd.service
     state: restarted
     scope: user
+  when: herd_restart_on_change | bool

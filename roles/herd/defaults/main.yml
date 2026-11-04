@@ -34,3 +34,13 @@ herd_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_versi
 # Composer voice input (OpenAI speech-to-text). Enabled per host; requires
 # herd_openai_api_key in vars/secrets.yml.
 herd_voice_input: false
+
+# Memory caps for the whole unit cgroup (server + every agent session and its tool children).
+# MemoryMax takes a percentage of host RAM so one value fits both hosts.
+herd_memory_max: "70%"
+herd_memory_swap_max: "8G"
+
+# Unit changes restart herd by default, which kills any agent session it hosts (including one
+# running this playbook). Pass -e herd_restart_on_change=false to only daemon-reload, then
+# restart later, e.g. `systemd-run --user --on-active=45 systemctl --user restart herd`.
+herd_restart_on_change: true

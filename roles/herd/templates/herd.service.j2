@@ -9,6 +9,11 @@ WorkingDirectory={{ herd_install_dir }}/server
 ExecStart={{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_version }}/bin/node {{ herd_install_dir }}/server/herd-server.cjs
 Restart=on-failure
 RestartSec=2
+# Agent sessions run builds/tests inside this cgroup: cap it so a runaway child is OOM-killed on its own
+# (OOMPolicy=continue) instead of exhausting host RAM+swap and taking the whole unit down with it.
+OOMPolicy=continue
+MemoryMax={{ herd_memory_max }}
+MemorySwapMax={{ herd_memory_swap_max }}
 Environment=HOME={{ ansible_env.HOME }}
 Environment=TMPDIR=/tmp
 Environment=PATH={{ herd_service_path }}
