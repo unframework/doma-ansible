@@ -41,3 +41,6 @@ vector_betterstack_uri: "https://s2763957.us-west-2a.betterstackdata.com"
 # was physically moved. plankton's stack is stopped and cannot run without the
 # radio.
 docker_stack_active: true
+
+# herd composer voice input (key: herd_openai_api_key in vars/secrets.yml)
+herd_voice_input: true

@@ -16,6 +16,9 @@ Environment=HERD_PORT={{ herd_port }}
 Environment=HERD_HOST={{ herd_bind_host }}
 Environment=HERD_UI_DIST={{ herd_install_dir }}/ui
 Environment=HERD_CLAUDE_BIN={{ ansible_env.HOME }}/.local/bin/claude
+{% if herd_voice_input %}
+Environment=HERD_OPENAI_API_KEY={{ herd_openai_api_key }}
+{% endif %}
 
 [Install]
 WantedBy=default.target

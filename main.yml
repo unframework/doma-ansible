@@ -75,6 +75,8 @@
 - hosts: herd_host
   gather_facts: yes
   become: no
+  vars_files:
+    - vars/secrets.yml
   roles:
     - { role: herd, tags: ['herd'] }
 

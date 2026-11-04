@@ -30,3 +30,7 @@ herd_tailscale_https_port: 8443
 # Env PATH for the service — herd shells out to `claude`, which needs node and
 # ~/.local/bin on PATH. Single string, same convention as openclaw_service_path.
 herd_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_version }}/bin:{{ ansible_env.HOME }}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+# Composer voice input (OpenAI speech-to-text). Enabled per host; requires
+# herd_openai_api_key in vars/secrets.yml.
+herd_voice_input: false
