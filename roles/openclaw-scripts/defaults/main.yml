@@ -14,6 +14,7 @@ openclaw_scripts_unit_defaults:
   openclaw-my-docs-pull.timer: true
   openclaw-my-docs-sweep.timer: true
   openclaw-timeline-tick.timer: true
+  openclaw-claude-session-archive.timer: true
   obsidian-sync.service: true
   debug-log-forwarder.timer: false      # 2026-08-07: too noisy in the Telegram debug topic
   openclaw-sq-triage.timer: false       # 2026-07-08: paused
@@ -38,6 +39,10 @@ my_docs_pull_schedule: "*:05"
 my_docs_sweep_schedule: "06:20"
 my_docs_sweep_min_age_hours: 1
 my_docs_sweep_max_files: 10
+
+# Archive repo for rendered Claude Code sessions, pushed to GitHub on each change.
+claude_session_archive_dir: "{{ ansible_env.HOME }}/claude-session-data"
+claude_session_archive_schedule: "*:40"
 
 # qmd search collections. Notion points at the editing clone (not the sync
 # remote) so search results map to files the agent can actually edit. Note this

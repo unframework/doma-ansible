@@ -1,0 +1,9 @@
+[Unit]
+Description=Archive Claude Code sessions hourly
+
+[Timer]
+OnCalendar={{ claude_session_archive_schedule }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target

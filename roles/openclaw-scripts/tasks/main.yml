@@ -144,6 +144,21 @@
     mode: '0644'
   notify: Reload systemd user
 
+# Claude Session Archive (hourly render + push to the archive repo)
+- name: Template openclaw-claude-session-archive service
+  template:
+    src: openclaw-claude-session-archive.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-claude-session-archive.service"
+    mode: '0644'
+  notify: Reload systemd user
+
+- name: Template openclaw-claude-session-archive timer
+  template:
+    src: openclaw-claude-session-archive.timer.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/openclaw-claude-session-archive.timer"
+    mode: '0644'
+  notify: Reload systemd user
+
 # Obsidian Sync (headless continuous)
 
 - name: Ensure obsidian-headless (ob) CLI is installed globally
