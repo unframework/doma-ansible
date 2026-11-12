@@ -1,0 +1,172 @@
+---
+# dev-proxy — wildcard DNS + Caddy (system) + portless proxy (user unit).
+
+- name: Fail early if the Cloudflare token is missing from the vault
+  ansible.builtin.fail:
+    msg: "cloudflare_dns_api_token is not defined — add it to vars/secrets.yml (ansible-vault edit)."
+  when: (cloudflare_dns_api_token | default('')) | length == 0
+
+- name: Read this node's tailnet IPs
+  ansible.builtin.command: tailscale ip
+  register: dev_proxy_tailscale_ip
+  changed_when: false
+  check_mode: false
+
+- name: Collect tailnet IPs
+  ansible.builtin.set_fact:
+    dev_proxy_tailnet_ips: "{{ dev_proxy_tailscale_ip.stdout_lines | map('trim') | select | list }}"
+
+# ---------------------------------------------------------------------------
+# DNS — public wildcard records pointing at tailnet-only addresses. DNS-only:
+# Cloudflare can't proxy to 100.x, and proxying would terminate TLS there.
+# ---------------------------------------------------------------------------
+
+- name: Point the dev wildcard at this node's tailnet IPs
+  community.general.cloudflare_dns:
+    api_token: "{{ cloudflare_dns_api_token }}"
+    zone: "{{ dev_proxy_cloudflare_zone }}"
+    record: "*.{{ dev_proxy_domain | regex_replace('\\.' ~ (dev_proxy_cloudflare_zone | regex_escape) ~ '$', '') }}"
+    type: "{{ 'AAAA' if ':' in item else 'A' }}"
+    value: "{{ item }}"
+    proxied: false
+    solo: true
+    ttl: 300
+  loop: "{{ dev_proxy_tailnet_ips }}"
+  no_log: true
+
+# ---------------------------------------------------------------------------
+# Caddy
+# ---------------------------------------------------------------------------
+
+- name: Create caddy system user
+  ansible.builtin.user:
+    name: caddy
+    system: true
+    home: /var/lib/caddy
+    create_home: true
+    shell: /usr/sbin/nologin
+  become: true
+
+- name: Ensure caddy release directory exists
+  ansible.builtin.file:
+    path: /usr/local/lib/caddy
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Download pinned caddy build with DNS modules
+  ansible.builtin.get_url:
+    url: >-
+      https://caddyserver.com/api/download?os=linux&arch=amd64&version={{ dev_proxy_caddy_version
+      }}{% for m in dev_proxy_caddy_modules %}&p={{ m | urlencode }}{% endfor %}
+    dest: "/usr/local/lib/caddy/caddy-{{ dev_proxy_caddy_version }}"
+    mode: '0755'
+    timeout: 120
+  become: true
+
+- name: Link caddy binary
+  ansible.builtin.file:
+    src: "/usr/local/lib/caddy/caddy-{{ dev_proxy_caddy_version }}"
+    dest: /usr/local/bin/caddy
+    state: link
+  become: true
+  notify: Restart caddy
+
+- name: Ensure caddy config directory exists
+  ansible.builtin.file:
+    path: /etc/caddy
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Write caddy environment
+  ansible.builtin.copy:
+    content: "CLOUDFLARE_API_TOKEN={{ cloudflare_dns_api_token }}\n"
+    dest: /etc/caddy/caddy.env
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+  no_log: true
+  notify: Restart caddy
+
+- name: Template Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    mode: '0644'
+    validate: /usr/local/bin/caddy adapt --adapter caddyfile --config %s
+  become: true
+  notify: Reload caddy
+
+- name: Template caddy.service unit
+  ansible.builtin.template:
+    src: caddy.service.j2
+    dest: /etc/systemd/system/caddy.service
+    mode: '0644'
+  become: true
+  notify:
+    - Reload systemd
+    - Restart caddy
+
+# Lets Caddy fetch the node's ts.net cert from the local tailscaled.
+- name: Permit caddy to request Tailscale certs
+  ansible.builtin.lineinfile:
+    path: /etc/default/tailscaled
+    regexp: '^TS_PERMIT_CERT_UID='
+    line: TS_PERMIT_CERT_UID=caddy
+  become: true
+  notify: Restart tailscaled
+
+- name: Flush handlers before starting caddy
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start caddy
+  ansible.builtin.systemd:
+    name: caddy.service
+    enabled: true
+    state: started
+  become: true
+
+# ---------------------------------------------------------------------------
+# portless
+# ---------------------------------------------------------------------------
+
+- name: Check that portless is installed
+  ansible.builtin.stat:
+    path: "{{ dev_proxy_portless_bin }}"
+  register: dev_proxy_portless_stat
+
+- name: Fail early if portless is missing
+  ansible.builtin.fail:
+    msg: "{{ dev_proxy_portless_bin }} not found — run the `dev` role first (dev_global_npm_packages)."
+  when: not dev_proxy_portless_stat.stat.exists
+
+- name: Expose portless on every node's PATH
+  ansible.builtin.file:
+    src: "{{ dev_proxy_portless_bin }}"
+    dest: "{{ ansible_env.HOME }}/.local/bin/portless"
+    state: link
+
+- name: Ensure user systemd directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: '0755'
+
+- name: Template portless-proxy.service unit
+  ansible.builtin.template:
+    src: portless-proxy.service.j2
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/portless-proxy.service"
+    mode: '0644'
+  notify:
+    - Reload systemd user
+    - Restart portless proxy
+
+- name: Enable and start portless proxy
+  ansible.builtin.systemd:
+    name: portless-proxy.service
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true

@@ -1,0 +1,33 @@
+---
+# dev-proxy — stable tailnet HTTPS names for dev servers:
+#   https://<project>.dev.unframework.net           → <project>.localhost
+#   https://<project>--<branch>.dev.unframework.net → <branch>.<project>.localhost
+# Caddy terminates TLS on the tailnet IPs with a Let's Encrypt wildcard cert
+# (DNS-01 via Cloudflare) and hands off to the portless proxy, which owns port
+# assignment. Design notes: ~/herd plans/dev-domain.md.
+
+dev_proxy_domain: "dev.unframework.net"
+dev_proxy_cloudflare_zone: "unframework.net"
+
+# Pinned custom build from caddyserver.com's download API (Debian's caddy is
+# too old and has no DNS provider modules).
+dev_proxy_caddy_version: "v2.11.9"
+dev_proxy_caddy_modules:
+  - github.com/caddy-dns/cloudflare
+
+# Caddy also takes over tailnet :443 from Tailscale Serve, so it re-serves the
+# node's own ts.net name for whatever Serve had there (the OpenClaw gateway).
+# Serve must be off on 443 first (openclaw_tailscale_serve: false), otherwise
+# tailscaled intercepts the port and Caddy never sees traffic.
+dev_proxy_tsnet_name: "sandy.tail3cc64b.ts.net"
+dev_proxy_tsnet_upstream: "127.0.0.1:18789"
+
+# Plain-HTTP hop between Caddy and portless. portless has no bind-host option
+# and listens on all interfaces: ufw keeps it off the LAN, and the tailnet can
+# reach it, which is the same audience Caddy serves.
+dev_proxy_portless_port: 1355
+
+# portless comes from the dev role's global npm packages, which land in the
+# default nvm node; ~/.local/bin/portless exposes it on other nodes' PATHs too.
+dev_proxy_node_version: "{{ dev_node_version | default('v22.21.1') }}"
+dev_proxy_portless_bin: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ dev_proxy_node_version }}/bin/portless"

@@ -1,0 +1,11 @@
+[Unit]
+Description=portless proxy (dev server name routing, behind Caddy)
+
+[Service]
+Environment=PATH={{ dev_proxy_portless_bin | dirname }}:/usr/local/bin:/usr/bin:/bin
+ExecStart={{ dev_proxy_portless_bin }} proxy start --foreground --no-tls -p {{ dev_proxy_portless_port }}
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target

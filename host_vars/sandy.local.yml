@@ -8,6 +8,7 @@ vector_log_unit_filters:
   - "ledger-"
   - "obsidian"
   - "herd"
+  - "portless"
 
 vector_file_sources:
   - name: "ledger"
@@ -21,6 +22,7 @@ vector_system_journal_units:
   - "ssh.service"
   - "sshd.service"
   - "tailscaled.service"
+  - "caddy.service"
   - "systemd-logind.service"
   - "ufw.service"
   - "unattended-upgrades.service"
@@ -31,6 +33,10 @@ vector_system_journal_units:
 # heartbeat or the Telegram long-poll would collide (plankton has them off).
 openclaw_scripts_active: true
 openclaw_gateway_enabled: true
+
+# dev-proxy's Caddy owns tailnet :443 and re-serves the ts.net root to the
+# gateway; Serve on 443 would intercept the port. Flip both back to roll back.
+openclaw_tailscale_serve: false
 
 # sandy ships to its own Better Stack source (sandy_server). Newer sources are
 # bound to a dedicated ingest host; the shared in.logs endpoint rejects their

@@ -30,6 +30,16 @@
     - { role: openclaw-scripts, tags: ['openclaw-scripts'] }
     - { role: ledger-sync, tags: ['ledger-sync'] }
 
+# Tailnet HTTPS names for dev servers (sandy only). After openclaw-base, which
+# releases tailnet :443 from Tailscale Serve before Caddy binds it.
+- hosts: dev_proxy_host
+  gather_facts: yes
+  become: no
+  vars_files:
+    - vars/secrets.yml
+  roles:
+    - { role: dev-proxy, tags: ['dev-proxy'] }
+
 # Workspace web — Telegram Mini App timeline server (sandy; it needs the
 # openclaw timeline data that lives on the gateway host, and the bot token from
 # the vault)

@@ -1,0 +1,31 @@
+{
+	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	auto_https disable_redirects
+}
+
+*.{{ dev_proxy_domain }} {
+	bind {{ dev_proxy_tailnet_ips | map('regex_replace', '^(.*:.*)$', '[\\1]') | join(' ') }}
+
+	@branch header_regexp branch Host ^([a-z0-9]+(?:-[a-z0-9]+)*)--([a-z0-9-]+)\.{{ dev_proxy_domain | regex_escape }}$
+	handle @branch {
+		reverse_proxy 127.0.0.1:{{ dev_proxy_portless_port }} {
+			header_up Host {re.branch.2}.{re.branch.1}.localhost
+		}
+	}
+
+	@main header_regexp main Host ^([a-z0-9]+(?:-[a-z0-9]+)*)\.{{ dev_proxy_domain | regex_escape }}$
+	handle @main {
+		reverse_proxy 127.0.0.1:{{ dev_proxy_portless_port }} {
+			header_up Host {re.main.1}.localhost
+		}
+	}
+
+	handle {
+		respond "Unknown dev host" 404
+	}
+}
+
+{{ dev_proxy_tsnet_name }} {
+	bind {{ dev_proxy_tailnet_ips | map('regex_replace', '^(.*:.*)$', '[\\1]') | join(' ') }}
+	reverse_proxy {{ dev_proxy_tsnet_upstream }}
+}

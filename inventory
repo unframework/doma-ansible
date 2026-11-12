@@ -60,3 +60,8 @@ sandy.local
 
 [doma:vars]
 ansible_python_interpreter=/usr/bin/python3
+
+# Host serving *.dev.unframework.net to the tailnet (Caddy + portless). Must be
+# the live gateway host: its Caddy takes over tailnet :443 and fronts the gateway.
+[dev_proxy_host]
+sandy.local

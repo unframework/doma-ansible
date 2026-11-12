@@ -1,0 +1,34 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Restart caddy
+  ansible.builtin.systemd:
+    name: caddy.service
+    state: restarted
+  become: true
+
+- name: Reload caddy
+  ansible.builtin.systemd:
+    name: caddy.service
+    state: reloaded
+  become: true
+
+- name: Restart tailscaled
+  ansible.builtin.systemd:
+    name: tailscaled.service
+    state: restarted
+  become: true
+
+- name: Reload systemd user
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+
+- name: Restart portless proxy
+  ansible.builtin.systemd:
+    name: portless-proxy.service
+    state: restarted
+    scope: user
