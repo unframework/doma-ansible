@@ -8,7 +8,7 @@ Type=notify
 User=caddy
 Group=caddy
 EnvironmentFile=/etc/caddy/caddy.env
-Environment=XDG_DATA_HOME=/var/lib XDG_CONFIG_HOME=/etc
+Environment=XDG_DATA_HOME=/var/lib
 ExecStart=/usr/local/bin/caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile --force
 TimeoutStopSec=5s

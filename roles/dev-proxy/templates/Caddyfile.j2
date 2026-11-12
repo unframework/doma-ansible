@@ -27,5 +27,8 @@
 
 {{ dev_proxy_tsnet_name }} {
 	bind {{ dev_proxy_tailnet_ips | map('regex_replace', '^(.*:.*)$', '[\\1]') | join(' ') }}
+	tls {
+		get_certificate tailscale
+	}
 	reverse_proxy {{ dev_proxy_tsnet_upstream }}
 }
