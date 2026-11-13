@@ -30,7 +30,7 @@ vector_system_journal_units:
 
 # Live gateway host since the 2026-09-16 cutover. Only one host may have these
 # on: two hosts sharing the my-docs clone, the ledger remote, the Better Stack
-# heartbeat or the Telegram long-poll would collide (plankton has them off).
+# heartbeat or the Telegram long-poll would collide.
 openclaw_scripts_active: true
 openclaw_gateway_enabled: true
 

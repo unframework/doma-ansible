@@ -1,6 +1,6 @@
 ---
 # openclaw-base defaults — installs the openclaw npm CLI + gateway systemd unit.
-# Values match plankton's current state so re-runs on plankton are no-ops.
+# Values originally frozen from plankton's hand-built install.
 
 # Pinned openclaw npm version. Bump this variable + rerun to update.
 # Note: this is the version installed via npm. openclaw_service_version below
@@ -12,7 +12,7 @@ openclaw_version: "2026.5.28"
 # Should be present under nvm (installed by the `dev` role).
 openclaw_node_version: "v22.21.1"
 
-# Systemd unit knobs. Defaults freeze plankton's current unit content.
+# Systemd unit knobs. Defaults originally froze plankton's unit content.
 openclaw_service_version: "2026.3.2"    # baked into Description + OPENCLAW_SERVICE_VERSION
 openclaw_gateway_port: 18789
 # Requires a working NVIDIA driver, not merely a GPU. sandy has a Quadro T400

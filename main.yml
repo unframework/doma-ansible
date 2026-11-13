@@ -9,7 +9,7 @@
     - { role: vector, tags: ['vector'] }
     - { role: known-hosts, tags: ['known-hosts'] }
 
-# mDNS publishing (sandy only; plankton's avahi is left as-is)
+# mDNS publishing
 - hosts: avahi_host
   gather_facts: yes
   become: no
@@ -17,8 +17,6 @@
     - { role: avahi, tags: ['avahi'] }
 
 # OpenClaw gateway host: dev tools + gateway service + companion scripts + ledger sync.
-# Live on sandy; plankton is still a member but its units are templated inactive
-# via host_vars until it is retired.
 - hosts: openclaw_host
   gather_facts: yes
   become: no
@@ -51,7 +49,7 @@
   roles:
     - { role: workspace-web, tags: ['workspace-web'] }
 
-# Containerised PBX (sandy only; plankton's hand-built Asterisk 16 is untouched)
+# Containerised PBX
 - hosts: asterisk_host
   gather_facts: yes
   become: no
@@ -74,14 +72,14 @@
   roles:
     - { role: tftpd, tags: ['tftpd'] }
 
-# Home Assistant + Music Assistant compose stack (sandy only)
+# Home Assistant + Music Assistant compose stack
 - hosts: docker_host
   gather_facts: yes
   become: no
   roles:
     - { role: docker-stack, tags: ['docker-stack'] }
 
-# Herd agent session server (both hosts, in parallel)
+# Herd agent session server
 - hosts: herd_host
   gather_facts: yes
   become: no
@@ -96,15 +94,3 @@
   become: no
   roles:
     - { role: drone-server, tags: ['drone-server'] }
-
-- hosts: plankton.local
-  gather_facts: no
-  become: yes
-  roles:
-    # - plex # set up user before storage
-    - storage
-    # - dns_authority
-
-  vars:
-    storage_mount_point: /mnt/usbmedia
-    storage_uuid: A6BCA8B3BCA88003

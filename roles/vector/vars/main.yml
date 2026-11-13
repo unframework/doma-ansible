@@ -1,3 +1,4 @@
 ---
 vector_sink_token: >-
-  {{ vector_betterstack_tokens[vector_host_name] | default(vector_betterstack_token) }}
+  {{ vector_betterstack_tokens[vector_host_name]
+     | mandatory('No Better Stack token for ' ~ vector_host_name ~ ' in vector_betterstack_tokens') }}

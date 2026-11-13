@@ -1,14 +1,8 @@
 [doma]
-plankton.local ansible_user=mmatants ansible_connection=ssh
 sandy.local    ansible_user=mmatants ansible_connection=local
 
-# Hosts carrying the OpenClaw gateway (+ companions). Cut over to sandy on
-# 2026-09-16; sandy is the live gateway. plankton stays a member until it is
-# retired so its units remain templated, but host_vars/plankton.local.yml sets
-# openclaw_scripts_active and openclaw_gateway_enabled to false so nothing runs
-# there. When retiring plankton, drop it from here.
+# Hosts carrying the OpenClaw gateway (+ companions).
 [openclaw_host]
-plankton.local
 sandy.local
 
 # Host running the workspace web Mini App. Must be the live gateway host, which
@@ -16,36 +10,26 @@ sandy.local
 [webapp_host]
 sandy.local
 
-# Host running the herd agent session server (tailnet-only via Tailscale Serve).
-# Deliberately BOTH hosts, running in parallel. Each node serves on its own
-# tailnet name, so the :8443 mappings do not collide. herd is how agent
-# sessions reach the box — disabling it on a host cuts off live sessions there.
+# Hosts running the herd agent session server (tailnet-only via Tailscale Serve).
+# herd is how agent sessions reach the box — disabling it on a host cuts off
+# live sessions there.
 [herd_host]
-plankton.local
 sandy.local
 
-# sandy only, deliberately, and not a group that flips at cutover.
-# plankton's Asterisk 16 is a hand-built bullseye-era install that predates any
-# IaC; the role below provisions Asterisk 22 from Sangoma. Naming plankton here
-# would point a major-version upgrade at a live PBX. It stays hand-managed until
-# it is decommissioned.
+# Host running the containerised Asterisk PBX.
 [asterisk_host]
 sandy.local
 
-# sandy only, for the same reason. plankton's compose stack is running but has
-# never been reconciled against the committed file since the HA version was
-# pinned, so applying the role there would recreate live containers.
+# Host running the Home Assistant + Music Assistant compose stack.
 [docker_host]
 sandy.local
 
-# TFTP server for the Mitel desk phone's firmware. Moving with the PBX so
-# plankton can eventually be retired; the phone must be pointed at sandy's
-# address (DHCP option 66 or the handset's own config) for this to take effect.
+# TFTP server for the Mitel desk phone's firmware. Must be the PBX host; the
+# phone is pointed at its address (DHCP option 66 or the handset's own config).
 [tftp_host]
 sandy.local
 
-# Hosts with a managed host firewall. sandy only: plankton runs with no firewall
-# at all, and enabling default-deny there would cut off its remaining services.
+# Hosts with a managed host firewall.
 [firewall_host]
 sandy.local
 
@@ -54,7 +38,7 @@ sandy.local
 sandy.local
 
 # Hosts whose avahi publishes only on the LAN interface, so <host>.local does
-# not resolve to a docker bridge address. sandy only; plankton is left as-is.
+# not resolve to a docker bridge address.
 [avahi_host]
 sandy.local
 
