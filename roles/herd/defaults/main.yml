@@ -35,6 +35,10 @@ herd_service_path: "{{ ansible_env.HOME }}/.nvm/versions/node/{{ herd_node_versi
 # herd_openai_api_key in vars/secrets.yml.
 herd_voice_input: false
 
+# Dev domain from the dev-proxy role. Set on hosts running it so the agent
+# prompt points sessions at portless URLs instead of `tailscale serve`.
+herd_portless_domain: ""
+
 # Memory caps for the whole unit cgroup (server + every agent session and its tool children).
 # MemoryMax takes a percentage of host RAM so one value fits both hosts.
 herd_memory_max: "70%"

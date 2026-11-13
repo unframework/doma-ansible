@@ -50,3 +50,6 @@ docker_stack_active: true
 
 # herd composer voice input (key: herd_openai_api_key in vars/secrets.yml)
 herd_voice_input: true
+
+# Matches dev-proxy's dev_proxy_domain.
+herd_portless_domain: "dev.unframework.net"
